@@ -103,6 +103,15 @@ public class MapTile extends Region {
     }
 
     /**
+     * Return the zoomLevel of this tile. This can not be changed, it is a 
+     * fixed property of the tile.
+     * @return the zoomLevel of this tile.
+     */
+    public int getZoomLevel () {
+        return myZoom;
+    }
+    
+    /**
      * Check if the image in this tile is still loading
      *
      * @return true in case the image is still loading, false in case the image
@@ -135,8 +144,18 @@ public class MapTile extends Region {
      * Return the tile that will cover us while loading
      * @return the lower-level zoom tile that covers this tile.
      */
-    public MapTile getCovering() {
+    public MapTile getCoveringTile() {
         return parentTile;
+    }
+    
+    /**
+     * Check if the current tile is covering more detailed tiles that are
+     * currently being loaded.
+     *
+     * @return
+     */
+    public boolean isCovering() {
+        return covering.size()>0;
     }
     
     @Override
@@ -177,14 +196,5 @@ public class MapTile extends Region {
         setTranslateY(256 * j * sf);
     }
 
-    /**
-     * Check if the current tile is covering more detailed tiles that are
-     * currently being loaded.
-     *
-     * @return
-     */
-    private boolean isCovering() {
-        return covering.size()>0;
-    }
 
 }
