@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2014, Johan Vos, LodgON
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of LodgON, the website lodgon.com, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL LODGON BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.lodgon.openmapfx.core;
 
 import static java.lang.Math.floor;
@@ -30,7 +56,7 @@ public class MapArea extends Group {
 
     private final DoubleProperty zoomProperty = new SimpleDoubleProperty();
 
-    private boolean debug = true;
+    private boolean debug = false;
     
     public MapArea() {
         for (int i = 0; i < tiles.length; i++) {
@@ -79,7 +105,7 @@ public class MapArea extends Group {
     public void moveY(double dy) {
         double zoom = zoomProperty.get();
         double maxty = 256*Math.pow(2,zoom)-this.getScene().getHeight();
-        System.out.println("ty = "+getTranslateY()+" and dy = "+dy);
+        if (debug) System.out.println("ty = "+getTranslateY()+" and dy = "+dy);
         if (getTranslateY() <= 0) {
             if (getTranslateY() + maxty >=0) {
                 setTranslateY(Math.min(0, getTranslateY() - dy));
@@ -94,7 +120,7 @@ public class MapArea extends Group {
     }
     
     public void setZoom (double z) {
-        System.out.println("setZoom called");
+        if (debug) System.out.println("setZoom called");
         zoomProperty.set(z);
         loadTiles();
     }
@@ -111,7 +137,7 @@ public class MapArea extends Group {
         double t1y = pivotY - tyold;
         double t2y = 1. - Math.pow(2, dz);
         double totY = t1y * t2y;
-        System.out.println("zp = "+zp+", txold = "+txold+", totx = "+totX+", tyold = "+tyold+", toty = "+totY);
+        if (debug) System.out.println("zp = "+zp+", txold = "+txold+", totx = "+totX+", tyold = "+tyold+", toty = "+totY);
         if ((delta > 0)) {
             if (zp < MAX_ZOOM) {
                 setTranslateX(txold + totX);
@@ -134,7 +160,7 @@ public class MapArea extends Group {
                 }
             }
         }
-        System.out.println("after, zp = "+zoomProperty.get());
+        if (debug) System.out.println("after, zp = "+zoomProperty.get());
     }
 
     
@@ -157,7 +183,6 @@ public class MapArea extends Group {
         long imax = Math.min(i_max,imin + (long) (width * Math.pow(2, deltaZ) / 256) + 3);
         long jmax = Math.min(j_max, jmin + (long) (height * Math.pow(2, deltaZ) / 256) + 3);
         if (debug) {
-
             System.out.println("zoom = "+nearestZoom+", active = "+activeZoom+", loadtiles, check i-range: " + imin + ", " + imax + " and j-range: " + jmin + ", " + jmax);
         }
         for (long i = imin; i < imax; i++) {
@@ -171,12 +196,12 @@ public class MapArea extends Group {
                     }
                     MapTile tile = new MapTile(this, nearestZoom, i, j);
                     tiles[nearestZoom].put(key, new SoftReference<>(tile));
-//                    MapTile covering = tile.getCovering();
-//                    if (covering != null) {
-//                        if (!getChildren().contains(covering)) {
-//                            getChildren().add(covering);
-//                        }
-//                    }
+                    MapTile covering = tile.getCovering();
+                    if (covering != null) {
+                        if (!getChildren().contains(covering)) {
+                            getChildren().add(covering);
+                        }
+                    }
 
                     getChildren().add(tile);
                 } else {
@@ -187,7 +212,42 @@ public class MapArea extends Group {
                 }
             }
         }
-        // cleanupTiles();
+        // TODO cleanupTiles();
     }
 
+     
+    /**
+     * Find the "nearest" lower-zoom tile that covers a
+     * specific tile. This is used to find out what tile we have to show
+     * while a new tile is still loading
+     * @param zoom
+     * @param i
+     * @param j
+     * @return the lower-zoom tile which covers the specified tile
+     */
+    public MapTile findCovering (int zoom, long i, long j) {
+        while (zoom > 0) {
+            zoom --;
+            i=i/2;
+            j=j/2;
+            MapTile candidate = findTile(zoom, i, j);
+            if ((candidate != null) && (!candidate.loading())) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+    /**
+     * Return a specific tile
+     * @param zoom the zoomlevel
+     * @param i the x-index
+     * @param j the y-index
+     * @return the tile, only if it is still in the cache
+     */
+    private MapTile findTile(int zoom, long i, long j) {
+        Long key =  i * (1<<zoom) + j;
+        SoftReference<MapTile> exists = tiles[zoom].get(key);
+        return (exists == null) ? null : exists.get();
+    }
+    
 }
