@@ -18,7 +18,6 @@ public class LayeredMap extends Region {
             x0 = t.getSceneX();
             y0 = t.getSceneY();
         });
-//        setOnMouseReleased(t -> loadTiles());
         setOnMouseDragged(t -> {
             mapArea.moveX(x0-t.getSceneX());
             mapArea.moveY(y0-t.getSceneY());
@@ -29,10 +28,19 @@ public class LayeredMap extends Region {
 
     }
     
+    /**
+     * Explicitly set the zoom level for this map.
+     * @param z the zoom level
+     */
     public void setZoom (double z) {
         this.mapArea.setZoom(z);
     }
     
+    /**
+     * Explicitly center the map around this location
+     * @param lat latitude
+     * @param lon longitude
+     */
     public void setCenter (double lat, double lon) {
         this.mapArea.setCenter(lat, lon);
     }
