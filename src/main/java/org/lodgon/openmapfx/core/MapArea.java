@@ -36,6 +36,9 @@ public class MapArea extends Group {
         for (int i = 0; i < tiles.length; i++) {
             tiles[i] = new HashMap<>();
         }
+        zoomProperty.addListener((ov, t, t1) -> 
+            nearestZoom = (Math.min((int) floor(t1.doubleValue() + TIPPING),MAX_ZOOM-1)));
+
     }
 
     public void setCenter (double lon, double lat) {
@@ -54,9 +57,7 @@ public class MapArea extends Group {
         double tty = mey - this.getScene().getHeight()/2;
         setTranslateX(-1* ttx);
         setTranslateY(-1* tty);
-         zoomProperty.addListener((ov, t, t1) -> 
-            nearestZoom = (Math.min((int) floor(t1.doubleValue() + TIPPING),MAX_ZOOM-1)));
-        if (debug)  System.out.println("setCenter, tx = "+this.getTranslateX()+", with = "+this.getScene().getWidth()/2+", mex = "+mex);
+                if (debug)  System.out.println("setCenter, tx = "+this.getTranslateX()+", with = "+this.getScene().getWidth()/2+", mex = "+mex);
         loadTiles();  
     }
     
@@ -93,7 +94,9 @@ public class MapArea extends Group {
     }
     
     public void setZoom (double z) {
+        System.out.println("setZoom called");
         zoomProperty.set(z);
+        loadTiles();
     }
      
     public void zoom(double delta, double pivotX, double pivotY) {
@@ -153,11 +156,10 @@ public class MapArea extends Group {
         long jmin = Math.max(0, (long) (-ty * Math.pow(2, deltaZ) / 256));
         long imax = Math.min(i_max,imin + (long) (width * Math.pow(2, deltaZ) / 256) + 3);
         long jmax = Math.min(j_max, jmin + (long) (height * Math.pow(2, deltaZ) / 256) + 3);
-//        if (debug) {
-//            System.out.println("j_max = "+j_max+", "+(long) (height * Math.pow(2, deltaZ) / 256));
-//            System.out.println("jmax = "+jmax);
-//            System.out.println("zoom = "+nearestZoom+", loadtiles, check i-range: " + imin + ", " + imax + " and j-range: " + jmin + ", " + jmax);
-//        }
+        if (debug) {
+
+            System.out.println("zoom = "+nearestZoom+", active = "+activeZoom+", loadtiles, check i-range: " + imin + ", " + imax + " and j-range: " + jmin + ", " + jmax);
+        }
         for (long i = imin; i < imax; i++) {
             for (long j = jmin; j < jmax; j++) {
                 Long key = i * i_max + j;

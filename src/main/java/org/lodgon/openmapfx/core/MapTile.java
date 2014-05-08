@@ -55,6 +55,7 @@ public class MapTile extends Region {
         mapArea.zoomProperty().addListener(new WeakInvalidationListener(zl));
         mapArea.translateXProperty().addListener (new WeakInvalidationListener(zl));
         mapArea.translateYProperty().addListener (new WeakInvalidationListener(zl));
+        calculatePosition();
     }
     
     private InvalidationListener recalculate() {
