@@ -71,5 +71,13 @@ public class LayeredMap extends Region {
         this.mapArea.setCenter(lat, lon);
     }
     
+    /**
+     * Return the MapArea that is backing this map 
+     * @return the MapArea used as the geomap for this layeredmap
+     */
+    public MapArea getMapArea () {
+        return this.mapArea;
+    }
+    
     
 }

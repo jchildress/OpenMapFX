@@ -35,6 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.lodgon.openmapfx.core.MapArea;
+import org.lodgon.openmapfx.core.LayeredMap;
 
 public class LeapMotionMapView extends Application {
 
@@ -46,12 +47,13 @@ public class LeapMotionMapView extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        MapArea mapArea = new MapArea();
+        LayeredMap map = new LayeredMap();
+        MapArea mapArea = map.getMapArea();
 
         Label copyright = new Label("(c) OpenStreetMap Contributors");
         Overlay overlay = new Overlay();
         Pane parent = new Pane();
-        parent.getChildren().addAll(mapArea, overlay, copyright);
+        parent.getChildren().addAll(map, overlay, copyright);
 
         scene = new Scene(parent, 800, 600);
         primaryStage.setTitle("JavaFX Map application");
@@ -62,8 +64,9 @@ public class LeapMotionMapView extends Application {
         copyright.setLayoutX(10);
         overlay.layoutXProperty().bind(scene.widthProperty().add(-overlay.getWidth()));
         overlay.layoutYProperty().bind(scene.heightProperty().add(-overlay.getHeight()));
-        mapArea.loadTiles();
-        mapArea.setCenter(50.8, 4.3);
+//        map.loadTiles();
+        map.setZoom(5);
+        map.setCenter(50.8,4.3);
         try {
             listener = new SimpleLeapListener();
             leapController = new Controller();
@@ -83,7 +86,7 @@ public class LeapMotionMapView extends Application {
                         mapArea.moveY((t1.getZ() / 35d));
                     }
                     if ((t1.getY() < 160) && (t1.getY() > 30)) {
-                        if (System.currentTimeMillis() - last > 100) {
+                        if (System.currentTimeMillis() - last > 20) {
                             mapArea.zoom(.1, scene.getWidth()/2, scene.getHeight()/2);
                             last = System.currentTimeMillis();
                         }

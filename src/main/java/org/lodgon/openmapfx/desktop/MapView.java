@@ -47,6 +47,6 @@ public class MapView extends Application {
         stage.setScene(scene);
         stage.show();
         map.setZoom(4);
-        map.setCenter(4.2, 50.2);
+        map.setCenter(50.2, 4.2);
     }
 }
