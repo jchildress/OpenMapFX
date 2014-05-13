@@ -81,7 +81,7 @@ public class MapArea extends Group {
 
     }
 
-    public void setCenter(double lon, double lat) {
+    public void setCenter(double lat, double lon) {
         if (getScene() == null) {
             if (debug) {
                 System.out.println("Ignore setting center since scene is null.");

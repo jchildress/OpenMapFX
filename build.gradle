@@ -1,4 +1,6 @@
-apply plugin: 'java'
+allprojects {
+    apply plugin: 'java'
+}
 apply plugin: 'application'
 
 sourceCompatibility = '1.8'
@@ -7,6 +9,16 @@ mainClassName = "org.lodgon.openmapfx.desktop.MapView"
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'org.lodgon.openmapfx.desktop.MapView'
+}
+
+project (':leapmotion') {
+    compileJava.onlyIf{project.hasProperty('LEAPSDK')}
+    if (project.hasProperty('LEAPSDK')) {
+    dependencies {
+        compile files("$LEAPSDK/lib/LeapJava.jar");
+        compile project(":");
+    }
+    }
 }
 
 repositories {

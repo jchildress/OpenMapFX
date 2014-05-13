@@ -24,60 +24,41 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.lodgon.openmapfx.core;
+package org.lodgon.openmapfx.leapmotion;
 
-import javafx.scene.layout.Region;
+import com.leapmotion.leap.Controller;
+import com.leapmotion.leap.Hand;
+import com.leapmotion.leap.Listener;
+import com.leapmotion.leap.Vector;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Point3D;
 
 /**
  *
  * @author johan
  */
-public class LayeredMap extends Region {
-    
-    private final MapArea mapArea;
-    private double x0,y0;
-    
-    public LayeredMap () {
-        this.mapArea = new MapArea();
-        this.getChildren().add(mapArea);
-        setOnMousePressed(t -> {
-            x0 = t.getSceneX();
-            y0 = t.getSceneY();
-        });
-        setOnMouseDragged(t -> {
-            mapArea.moveX(x0-t.getSceneX());
-            mapArea.moveY(y0-t.getSceneY());
-            x0 = t.getSceneX();
-            y0 = t.getSceneY();
-        });
-        setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()) );
+public class SimpleLeapListener extends Listener {
 
+    private final BooleanProperty move=new SimpleBooleanProperty(false);
+    private final ObjectProperty<Point3D> palm=new SimpleObjectProperty<>();
+    public ObservableValue<Point3D> palmProperty(){ return palm; }
+
+    @Override
+    public void onFrame(Controller controller) {
+        move.set(false);
+        for(Hand hand: controller.frame().hands()){
+            if (hand.isValid() && (hand.fingers().count() > 0)) {
+                Vector palmPosition = hand.palmPosition();
+                palm.set(new Point3D(palmPosition.getX(), palmPosition.getY(), palmPosition.getZ()));
+                move.set(true);
+            }
+        }
+        if(!move.get()){
+            palm.set(new Point3D(0, 200, 0));
+        }
     }
-    
-    /**
-     * Explicitly set the zoom level for this map.
-     * @param z the zoom level
-     */
-    public void setZoom (double z) {
-        this.mapArea.setZoom(z);
-    }
-    
-    /**
-     * Explicitly center the map around this location
-     * @param lat latitude
-     * @param lon longitude
-     */
-    public void setCenter (double lat, double lon) {
-        this.mapArea.setCenter(lat, lon);
-    }
-    
-    /**
-     * Return the MapArea that is backing this map 
-     * @return the MapArea used as the geomap for this layeredmap
-     */
-    public MapArea getMapArea () {
-        return this.mapArea;
-    }
-    
-    
 }
