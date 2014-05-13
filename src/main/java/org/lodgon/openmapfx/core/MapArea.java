@@ -60,7 +60,11 @@ public class MapArea extends Group {
     private int nearestZoom;
 
     private final DoubleProperty zoomProperty = new SimpleDoubleProperty();
-
+	
+	private double lat;
+	private double lon;
+	private boolean abortedTileLoad;
+	
     private boolean debug = false;
     private final Rectangle area;
 
@@ -75,6 +79,10 @@ public class MapArea extends Group {
         this.sceneProperty().addListener(i -> {
             area.widthProperty().bind(getScene().widthProperty().add(20));
             area.heightProperty().bind(getScene().heightProperty().add(20));
+			if (abortedTileLoad) {
+				abortedTileLoad = false;
+				setCenter(lat, lon);
+			}
         });
         zoomProperty.addListener((ov, t, t1)
                 -> nearestZoom = (Math.min((int) floor(t1.doubleValue() + TIPPING), MAX_ZOOM - 1)));
@@ -82,7 +90,10 @@ public class MapArea extends Group {
     }
 
     public void setCenter(double lat, double lon) {
+		this.lat = lat;
+		this.lon = lon;
         if (getScene() == null) {
+			abortedTileLoad = true;
             if (debug) {
                 System.out.println("Ignore setting center since scene is null.");
             }
