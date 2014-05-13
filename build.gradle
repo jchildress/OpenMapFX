@@ -11,13 +11,52 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = 'org.lodgon.openmapfx.desktop.MapView'
 }
 
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+
+  dependencies {
+     classpath 'me.tatarka:gradle-retrolambda:1.3.0'
+  }
+}
+
+
 project (':leapmotion') {
     compileJava.onlyIf{project.hasProperty('LEAPSDK')}
     if (project.hasProperty('LEAPSDK')) {
-    dependencies {
-        compile files("$LEAPSDK/lib/LeapJava.jar");
-        compile project(":");
+        dependencies {
+            compile files("$LEAPSDK/lib/LeapJava.jar");
+            compile project(":");
+        }
     }
+}
+
+project (':android') {
+    repositories {
+      mavenCentral()
+    }
+    compileJava.onlyIf{project.hasProperty('ANDROIDSDK')}
+    if (project.hasProperty('ANDROIDSDK')) {
+        dependencies {
+            compile files("$ANDROIDSDK/android.jar");
+            compile files("$JAVAFXSDK/rt/lib/ext/jfxdvk.jar");
+            compile project(":");
+        }
+        apply plugin: 'retrolambda'
+    }
+    classes {
+        doLast {
+            copy {
+                from ("../build/classes/main")
+                into ("build/retrolambda/main")
+            }
+            println 'classes copied';
+        }
+    }
+
+    jar {
+        archiveName 'openmapfx-android.jar'
     }
 }
 
