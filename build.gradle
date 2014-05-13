@@ -11,6 +11,16 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = 'org.lodgon.openmapfx.desktop.MapView'
 }
 
+project (':leapmotion') {
+    compileJava.onlyIf{project.hasProperty('LEAPSDK')}
+    if (project.hasProperty('LEAPSDK')) {
+    dependencies {
+        compile files("$LEAPSDK/lib/LeapJava.jar");
+        compile project(":");
+    }
+    }
+}
+
 repositories {
     mavenCentral()
 }

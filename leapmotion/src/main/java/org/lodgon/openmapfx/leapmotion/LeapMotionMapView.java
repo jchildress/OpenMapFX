@@ -40,6 +40,8 @@ public class LeapMotionMapView extends Application {
 
     private SimpleLeapListener listener;
     private Controller leapController;
+    private Scene scene;
+    private long last = 0;
 
     @Override
     public void start(Stage primaryStage) {
@@ -51,7 +53,7 @@ public class LeapMotionMapView extends Application {
         Pane parent = new Pane();
         parent.getChildren().addAll(mapArea, overlay, copyright);
 
-        Scene scene = new Scene(parent, 800, 600);
+        scene = new Scene(parent, 800, 600);
         primaryStage.setTitle("JavaFX Map application");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -79,6 +81,18 @@ public class LeapMotionMapView extends Application {
                     }
                     if (Math.abs(t1.getZ()) > 10) {
                         mapArea.moveY((t1.getZ() / 35d));
+                    }
+                    if ((t1.getY() < 160) && (t1.getY() > 30)) {
+                        if (System.currentTimeMillis() - last > 100) {
+                            mapArea.zoom(.1, scene.getWidth()/2, scene.getHeight()/2);
+                            last = System.currentTimeMillis();
+                        }
+                    }
+                    if (t1.getY() > 240) {
+                        if (System.currentTimeMillis() - last > 20) {
+                            mapArea.zoom(-.1, scene.getWidth()/2, scene.getHeight()/2);
+                            last = System.currentTimeMillis();
+                        }
                     }
                     overlay.setNavigation(t1);
                 }));
