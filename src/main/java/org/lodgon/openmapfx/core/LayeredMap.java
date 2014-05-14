@@ -51,7 +51,6 @@ public class LayeredMap extends Region {
             y0 = t.getSceneY();
         });
         setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()) );
-
     }
     
     /**
