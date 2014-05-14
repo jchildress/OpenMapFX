@@ -92,5 +92,7 @@ project (':android') {
             from javafxsdkloc+'/rt/lib/ext/jfxdvk.jar'
             into 'native/libs'
         }
+        File srcdir = new File('android/native/src');
+        srcdir.mkdir();
     }
 }
