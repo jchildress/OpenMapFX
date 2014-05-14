@@ -63,6 +63,10 @@ public class MapView extends Application {
         PositionLayer positionLayer = new PositionLayer(image);
         map.getLayers().add(positionLayer);
         positionLayer.updatePosition(51.2, 4.2);
+        map.centerLatitudeProperty().addListener (i -> 
+        {
+            System.out.println("center of map: lat = "+map.centerLatitudeProperty().get()+", lon = "+map.centerLongitudeProperty().get());
+        });
     }
 
 }

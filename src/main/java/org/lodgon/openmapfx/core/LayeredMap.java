@@ -146,4 +146,12 @@ public class LayeredMap extends Region {
     public DoubleProperty yShiftProperty () {
         return this.mapArea.translateYProperty();
     }
+    
+    public DoubleProperty centerLongitudeProperty() {
+        return this.mapArea.centerLon();
+    }
+    
+    public DoubleProperty centerLatitudeProperty() {
+        return this.mapArea.centerLat();
+    }
 }
