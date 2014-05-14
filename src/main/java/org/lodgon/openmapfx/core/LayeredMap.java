@@ -26,6 +26,12 @@
  */
 package org.lodgon.openmapfx.core;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
 /**
@@ -36,10 +42,27 @@ public class LayeredMap extends Region {
     
     private final MapArea mapArea;
     private double x0,y0;
+    ObservableList<MapLayer> layers = FXCollections.observableArrayList();
     
     public LayeredMap () {
         this.mapArea = new MapArea();
         this.getChildren().add(mapArea);
+        this.layers.addListener(new ListChangeListener<MapLayer>(){
+
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends MapLayer> c) {
+               while (c.next()) {
+                   for (MapLayer candidate : c.getAddedSubList()) {
+                       Node view = candidate.getView();
+                       getChildren().add(view);
+                       candidate.gotLayeredMap(LayeredMap.this);
+                   }
+                   for (MapLayer target : c.getRemoved()){
+                       getChildren().remove(target.getView());
+                   }
+               }
+            }
+        });
         setOnMousePressed(t -> {
             x0 = t.getSceneX();
             y0 = t.getSceneY();
@@ -79,5 +102,48 @@ public class LayeredMap extends Region {
         return this.mapArea;
     }
     
+    /**
+     * Return a mutable list of all layers that are handled by this LayeredMap
+     * The MapArea backing the map is not part of this list
+     * @return the list containing all layers
+     */
+    public ObservableList<MapLayer> getLayers() {
+        return layers;
+    }
     
+    /** 
+     * Return the (x,y) coordinates for the provides (lat, lon) point as it
+     * would appear on the current map, talking into account the zoom and
+     * translate properties
+     * @param lat
+     * @param lon
+     * @return 
+     */
+    public Point2D getMapPoint (double lat, double lon) {
+        return this.mapArea.getMapPoint(lat, lon);
+    }
+    
+    /**
+     * Return the zoom property for the backing map
+     * @return the zoom property for the backing map
+     */
+    public DoubleProperty zoomProperty() {
+        return this.mapArea.zoomProperty();
+    }
+    
+    /**
+     * Return the horizontal translation of the backing map
+     * @return the horizontal translation of the backing map
+     */
+    public DoubleProperty xShiftProperty () {
+        return this.mapArea.translateXProperty();
+    }
+    
+    /**
+     * Return the vertical translation of the backing map
+     * @return the vertical translation of the backing map
+     */
+    public DoubleProperty yShiftProperty () {
+        return this.mapArea.translateYProperty();
+    }
 }

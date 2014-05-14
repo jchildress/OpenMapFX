@@ -34,6 +34,7 @@ import java.util.Map;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -205,7 +206,27 @@ public class MapArea extends Group {
     public DoubleProperty zoomProperty() {
         return zoomProperty;
     }
-
+    
+    public Point2D getMapPoint (double lat, double lon) {
+        return getMapPoint (zoomProperty.get(), lat, lon);
+    }
+    
+    private Point2D getMapPoint(double zoom, double lat, double lon) {
+        if (this.getScene() == null) return null;
+        double n = Math.pow(2,zoom);
+        double lat_rad = Math.PI * lat / 180;
+        double id = n / 360. * (180 + lon);
+        double jd = n * (1 - (Math.log(Math.tan(lat_rad) + 1 / Math.cos(lat_rad)) / Math.PI)) / 2;
+        double mex = (double) id * 256;
+        double mey = (double) jd * 256;
+        double ttx = mex -this.getScene().getWidth()/2;
+        double tty = mey - this.getScene().getHeight()/2;
+        double x = this.getTranslateX() + mex;
+        double y = this.getTranslateY() + mey;
+        Point2D answer = new  Point2D(x,y);
+        return answer;
+    }
+    
     public final void loadTiles() {
         if (getScene() == null) {
             return;

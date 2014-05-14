@@ -24,45 +24,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.lodgon.openmapfx.desktop;
 
-import java.net.URL;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
-import org.lodgon.openmapfx.core.LayeredMap;
-import org.lodgon.openmapfx.core.PositionLayer;
+package org.lodgon.openmapfx.core;
 
-public class MapView extends Application {
+import javafx.scene.Node;
 
-    LayeredMap map;
+/**
+ *
+ * @author johan
+ */
+public interface MapLayer {
     
     /**
-     * @param args the command line arguments
+     * Implementations must provide a Node that can be added to the view
+     * by the LayeredMap implementation
+     * @return the view for this specific MapLayer
      */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        map = new LayeredMap();
-        Scene scene = new Scene(map, 800, 600);
-        stage.setScene(scene);
-        stage.show();
-        map.setZoom(4);
-        map.setCenter(50.2, 4.2);
-        showMyLocation();
-    }
+    public Node getView();
     
+    /**
+     * Callback method that will be called once this MapLayer is successfully
+     * added to a LayeredMap
+     * @param map the provided map.
+     */
+    public void gotLayeredMap (LayeredMap map);
     
-    private void showMyLocation() {
-        URL im = this.getClass().getResource("../icons/mylocation.png");
-        Image image = new Image(im.toString());
-        PositionLayer positionLayer = new PositionLayer(image);
-        map.getLayers().add(positionLayer);
-        positionLayer.updatePosition(51.2, 4.2);
-    }
-
 }

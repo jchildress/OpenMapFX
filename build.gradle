@@ -95,4 +95,5 @@ project (':android') {
         File srcdir = new File('android/native/src');
         srcdir.mkdir();
     }
+    preparenative.onlyIf{project.hasProperty('ANDROIDSDK')}
 }
