@@ -75,25 +75,28 @@ project (':android') {
         archiveName 'openmapfx-android.jar'
     }
     task preparenative(dependsOn: jar)  {
-        println 'creating native directories'
-        def localprop = new File ('android/native/local.properties')
-        def text = 'sdk.dir='+sdkloc+'\n'
-        localprop.text = text;
-        def antprop = new File('android/native/ant.properties');
-        def aptext = 'jfx.sdk.absolute.dir='+javafxsdkloc+'\n';
-        aptext = aptext + 'jfx.app.absolute.dist.dir='+project.projectDir+'/build/libs\n';
-        aptext = aptext + 'isDalvik=true\n';
-        antprop.text = aptext;
-        copy {
-            from javafxsdkloc+'/rt/lib/armeabi'
-            into 'native/libs/armeabi'
+// apparently, configuration might go wrong even if task is not executed?
+        if (project.hasProperty('ANDROIDSDK')) {
+            println 'creating native directories'
+            def localprop = new File ('android/native/local.properties')
+            def text = 'sdk.dir='+sdkloc+'\n'
+            localprop.text = text;
+            def antprop = new File('android/native/ant.properties');
+            def aptext = 'jfx.sdk.absolute.dir='+javafxsdkloc+'\n';
+            aptext = aptext + 'jfx.app.absolute.dist.dir='+project.projectDir+'/build/libs\n';
+            aptext = aptext + 'isDalvik=true\n';
+            antprop.text = aptext;
+            copy {
+                from javafxsdkloc+'/rt/lib/armeabi'
+                into 'native/libs/armeabi'
+            }
+            copy {
+                from javafxsdkloc+'/rt/lib/ext/jfxdvk.jar'
+                into 'native/libs'
+            }
+            File srcdir = new File('android/native/src');
+            srcdir.mkdir();
         }
-        copy {
-            from javafxsdkloc+'/rt/lib/ext/jfxdvk.jar'
-            into 'native/libs'
-        }
-        File srcdir = new File('android/native/src');
-        srcdir.mkdir();
     }
     preparenative.onlyIf{project.hasProperty('ANDROIDSDK')}
 }
