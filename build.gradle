@@ -11,14 +11,14 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = 'org.lodgon.openmapfx.desktop.MapView'
 }
 
-project (':leapmotion') {
-    compileJava.onlyIf{project.hasProperty('LEAPSDK')}
-    if (project.hasProperty('LEAPSDK')) {
-    dependencies {
-        compile files("$LEAPSDK/lib/LeapJava.jar");
-        compile project(":");
-    }
-    }
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+
+  dependencies {
+     classpath 'me.tatarka:gradle-retrolambda:1.3.0'
+  }
 }
 
 repositories {
@@ -27,4 +27,72 @@ repositories {
 
 dependencies {
        testCompile group: 'junit', name: 'junit', version: '4.10'
+}
+
+/******************************************************************************
+ * Project specific configurations                                            *
+ *****************************************************************************/
+
+
+project (':leapmotion') {
+    compileJava.onlyIf{project.hasProperty('LEAPSDK')}
+    if (project.hasProperty('LEAPSDK')) {
+        dependencies {
+            compile files("$LEAPSDK/lib/LeapJava.jar");
+            compile project(":");
+        }
+    }
+}
+
+project (':android') {
+    def sdkloc = ""
+    def javafxsdkloc = ""
+    repositories {
+      mavenCentral()
+    }
+    compileJava.onlyIf{project.hasProperty('ANDROIDSDK')}
+    if (project.hasProperty('ANDROIDSDK')) {
+        sdkloc="$ANDROIDSDK"
+        javafxsdkloc="$JAVAFXSDK"
+        dependencies {
+            compile files("$ANDROIDSDK/platforms/android-19/android.jar");
+            compile files("$JAVAFXSDK/rt/lib/ext/jfxdvk.jar");
+            compile project(":");
+        }
+        apply plugin: 'retrolambda'
+    }
+    classes {
+        doLast {
+            copy {
+                from ("../build/classes/main")
+                into ("build/retrolambda/main")
+            }
+            println 'classes copied';
+        }
+    }
+
+    jar {
+        archiveName 'openmapfx-android.jar'
+    }
+    task preparenative(dependsOn: jar)  {
+        println 'creating native directories'
+        def localprop = new File ('android/native/local.properties')
+        def text = 'sdk.dir='+sdkloc+'\n'
+        localprop.text = text;
+        def antprop = new File('android/native/ant.properties');
+        def aptext = 'jfx.sdk.absolute.dir='+javafxsdkloc+'\n';
+        aptext = aptext + 'jfx.app.absolute.dist.dir='+project.projectDir+'/build/libs\n';
+        aptext = aptext + 'isDalvik=true\n';
+        antprop.text = aptext;
+        copy {
+            from javafxsdkloc+'/rt/lib/armeabi'
+            into 'native/libs/armeabi'
+        }
+        copy {
+            from javafxsdkloc+'/rt/lib/ext/jfxdvk.jar'
+            into 'native/libs'
+        }
+        File srcdir = new File('android/native/src');
+        srcdir.mkdir();
+    }
 }
