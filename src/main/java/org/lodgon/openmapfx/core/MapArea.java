@@ -226,7 +226,7 @@ public class MapArea extends Group {
         double x = this.getTranslateX() + mex;
         double y = this.getTranslateY() + mey;
         Point2D answer = new  Point2D(x,y);
-               return answer;
+        return answer;
     }
     
     private void calculateCenterCoords() {
