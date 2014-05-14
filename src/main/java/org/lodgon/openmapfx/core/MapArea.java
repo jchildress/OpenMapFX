@@ -68,6 +68,8 @@ public class MapArea extends Group {
 	
     private boolean debug = false;
     private final Rectangle area;
+    private DoubleProperty centerLon = new SimpleDoubleProperty();
+    private DoubleProperty centerLat = new SimpleDoubleProperty();
 
     public MapArea() {
         for (int i = 0; i < tiles.length; i++) {
@@ -224,9 +226,27 @@ public class MapArea extends Group {
         double x = this.getTranslateX() + mex;
         double y = this.getTranslateY() + mey;
         Point2D answer = new  Point2D(x,y);
-        return answer;
+               return answer;
     }
     
+    private void calculateCenterCoords() {
+        double x = this.getScene().getWidth()/2-this.getTranslateX();
+        double y = this.getScene().getHeight()/2 - this.getTranslateY();
+        double zoom = zoomProperty.get();
+        double latrad = Math.PI - (2.0 * Math.PI * y) / (Math.pow(2, zoom)*256.);
+        double mlat = Math.toDegrees(Math.atan(Math.sinh(latrad)));
+        double mlon = x / (256*Math.pow(2, zoom)) * 360 - 180;
+        centerLon.set(mlon);
+        centerLat.set(mlat);
+    }
+    
+    public DoubleProperty centerLon() {
+        return centerLon;
+    }
+    
+    public DoubleProperty centerLat() {
+        return centerLat;
+    }
     public final void loadTiles() {
         if (getScene() == null) {
             return;
@@ -273,6 +293,7 @@ public class MapArea extends Group {
                 }
             }
         }
+        calculateCenterCoords();
         cleanupTiles();
     }
 
