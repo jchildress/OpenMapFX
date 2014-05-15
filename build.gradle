@@ -74,6 +74,14 @@ project (':android') {
     jar {
         archiveName 'openmapfx-android.jar'
     }
+    clean {
+        doLast {
+           File jfxdvk = file('native/libs/jfxdvk.jar');
+           jfxdvk.delete();
+           FileTree armeabidir = fileTree (dir: 'native/libs/armeabi');
+           armeabidir.each{File f -> delete(f)}
+        }
+    }
     task preparenative(dependsOn: jar)  {
 // apparently, configuration might go wrong even if task is not executed?
         if (project.hasProperty('ANDROIDSDK')) {
