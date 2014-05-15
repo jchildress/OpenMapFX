@@ -53,6 +53,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -78,6 +80,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafxports.android.FXActivity;
 import org.lodgon.openmapfx.core.LayeredMap;
+import org.lodgon.openmapfx.core.PositionLayer;
+import org.lodgon.openmapfx.core.TileProvider;
+import org.lodgon.openmapfx.core.TileType;
+import org.lodgon.openmapfx.providers.OSMTileProvider;
 
 // import org.scenicview.ScenicView;
 
@@ -101,7 +107,10 @@ public class AndroidMapView extends Application implements LocationListener{
         this.stage = primaryStage;
         double lat = 50.8456;
         double lon = 4.7238;
-        layeredMap = new LayeredMap();
+        TileProvider osm = new OSMTileProvider();
+        ObjectProperty<TileType> typeProperty = new SimpleObjectProperty<>(osm.getDefaultType());
+        layeredMap = new LayeredMap(typeProperty);
+        layeredMap.setZoom(14);
         if (real) {
             Context ctx = FXActivity.getInstance();
            
@@ -238,7 +247,12 @@ public class AndroidMapView extends Application implements LocationListener{
     }
 
     long last = System.currentTimeMillis();
-    
+    private void showMyLocation () {
+     URL im = this.getClass().getResource("../icons/mylocation.png");
+        Image image = new Image(im.toString());
+        PositionLayer positionLayer = new PositionLayer(image);
+        layeredMap.getLayers().add(positionLayer);
+    }
     @Override
     public void onLocationChanged(Location loc) {
         if (debug) System.out.println("[JVDBG] GOT NEW LOC: " + loc);
