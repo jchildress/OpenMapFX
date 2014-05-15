@@ -144,7 +144,7 @@ public class AndroidMapView extends Application implements LocationListener{
             };
             System.out.println("[JVDBG] START LOCATIONUPDATER");
             t.start();
-
+            showMyLocation();
         } else {
             fakeUpdates();
         }
@@ -247,10 +247,12 @@ public class AndroidMapView extends Application implements LocationListener{
     }
 
     long last = System.currentTimeMillis();
+    PositionLayer positionLayer;
+    
     private void showMyLocation () {
-     URL im = this.getClass().getResource("../icons/mylocation.png");
+     URL im = this.getClass().getResource("icons/mylocation.png");
         Image image = new Image(im.toString());
-        PositionLayer positionLayer = new PositionLayer(image);
+        positionLayer = new PositionLayer(image);
         layeredMap.getLayers().add(positionLayer);
     }
     @Override
@@ -264,7 +266,10 @@ public class AndroidMapView extends Application implements LocationListener{
                 @Override
                 public void run() {
                     if (debug) System.out.println("center map to "+lat+", "+lon);
-                    layeredMap.setCenter(lat, lon);
+                  if (positionLayer != null) {
+                    positionLayer.updatePosition(lat, lon);
+                  }
+                //    layeredMap.setCenter(lat, lon);
                 }
             });
         }
