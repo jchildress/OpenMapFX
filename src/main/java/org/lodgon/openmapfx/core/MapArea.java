@@ -104,7 +104,11 @@ public class MapArea extends Group {
         });
 
     }
-
+    
+    public ObjectProperty<TileType> tileTypeProperty() {
+        return tileType;
+    }
+    
     public void setCenter(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
@@ -260,7 +264,8 @@ public class MapArea extends Group {
     public DoubleProperty centerLat() {
         return centerLat;
     }
-    public final void loadTiles() {
+    
+    private final void loadTiles() {
         if (getScene() == null) {
             return;
         }
@@ -320,7 +325,7 @@ public class MapArea extends Group {
      * @param j
      * @return the lower-zoom tile which covers the specified tile
      */
-    public MapTile findCovering(int zoom, long i, long j) {
+    protected MapTile findCovering(int zoom, long i, long j) {
         while (zoom > 0) {
             zoom--;
             i = i / 2;
@@ -385,10 +390,7 @@ public class MapArea extends Group {
             System.out.println("DONE CLEANUP");
         }
     }
-    
-    public ObjectProperty<TileType> tileTypeProperty() {
-        return tileType;
-    }
+
     
     /** Reload all tiles on a change in provider. There could be a more 
      * efficient way?
