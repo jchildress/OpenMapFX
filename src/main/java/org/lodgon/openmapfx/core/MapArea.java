@@ -28,7 +28,6 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
