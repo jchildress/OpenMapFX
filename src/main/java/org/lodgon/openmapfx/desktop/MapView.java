@@ -28,15 +28,25 @@ package org.lodgon.openmapfx.desktop;
 
 import java.net.URL;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.PositionLayer;
+import org.lodgon.openmapfx.core.TileProvider;
+import org.lodgon.openmapfx.providers.MapQuestTileProvider;
+import org.lodgon.openmapfx.providers.OSMTileProvider;
 
 public class MapView extends Application {
 
     LayeredMap map;
+    
+    TileProvider[] tileProviders;
+    SimpleProviderPicker spp;
     
     /**
      * @param args the command line arguments
@@ -47,8 +57,26 @@ public class MapView extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        map = new LayeredMap();
-        Scene scene = new Scene(map, 800, 600);
+        
+        TileProvider mapQuest = new MapQuestTileProvider();
+        TileProvider osm = new OSMTileProvider();
+        spp = new SimpleProviderPicker(new TileProvider[]{mapQuest, osm});
+        
+        map = new LayeredMap(spp.selectedTileTypeProperty());
+        
+        BorderPane cbp = new BorderPane();
+        cbp.setCenter(map);
+        
+        Rectangle clip = new Rectangle(700, 600);
+        cbp.setClip(clip);
+        clip.heightProperty().bind(cbp.heightProperty());
+        clip.widthProperty().bind(cbp.widthProperty());
+        
+        BorderPane bp = new BorderPane();
+        bp.setTop(spp);
+        bp.setCenter(cbp);
+        
+        Scene scene = new Scene(bp, 800, 650);
         stage.setScene(scene);
         stage.show();
         map.setZoom(4);

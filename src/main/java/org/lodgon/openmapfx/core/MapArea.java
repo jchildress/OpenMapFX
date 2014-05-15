@@ -27,12 +27,17 @@ package org.lodgon.openmapfx.core;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -70,8 +75,12 @@ public class MapArea extends Group {
     private final Rectangle area;
     private DoubleProperty centerLon = new SimpleDoubleProperty();
     private DoubleProperty centerLat = new SimpleDoubleProperty();
-
-    public MapArea() {
+    
+    private final ObjectProperty<TileType> tileType = new SimpleObjectProperty<>();
+    
+    public MapArea(ObjectProperty<TileType> tileType) {
+        this.tileType.bind(tileType);
+        
         for (int i = 0; i < tiles.length; i++) {
             tiles[i] = new HashMap<>();
         }
@@ -89,6 +98,11 @@ public class MapArea extends Group {
         });
         zoomProperty.addListener((ov, t, t1)
                 -> nearestZoom = (Math.min((int) floor(t1.doubleValue() + TIPPING), MAX_ZOOM - 1)));
+        
+        this.tileType.addListener((ObservableValue<? extends TileType> obs, TileType o, TileType n) -> {
+            System.out.println("TileType was changed.");
+            reloadTiles();
+        });
 
     }
 
@@ -372,4 +386,35 @@ public class MapArea extends Group {
             System.out.println("DONE CLEANUP");
         }
     }
+    
+    public ObjectProperty<TileType> tileTypeProperty() {
+        return tileType;
+    }
+    
+    /** Reload all tiles on a change in provider. There could be a more 
+     * efficient way?
+     */
+    private void reloadTiles() {
+        
+        System.out.println("TileType was changed, reloading tiles.");
+        
+        List<Node> toRemove = new ArrayList<>();
+        ObservableList<Node> children = this.getChildren();
+        for (Node child : children) {
+            if (child instanceof MapTile) {
+                toRemove.add(child);
+            }
+        }
+        getChildren().removeAll(children);
+        
+        for (int i = 0; i < tiles.length; i++) {
+            tiles[i].clear();
+        }
+        
+        loadTiles();
+        
+    }
+    
+    
+    
 }

@@ -33,6 +33,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
@@ -44,7 +45,8 @@ import javafx.scene.transform.Scale;
  */
 public class MapTile extends Region {
 
-    static final String TILESERVER = "http://tile.openstreetmap.org/";
+    //static final String TILESERVER = "http://tile.openstreetmap.org/";//
+    //static final String TILESERVER = "http://otile1.mqcdn.com/tiles/1.0.0/map/";
     private final MapArea mapArea;
     private final int myZoom;
     private final long i, j;
@@ -80,7 +82,8 @@ public class MapTile extends Region {
         scale.setPivotX(0);
         scale.setPivotY(0);
         getTransforms().add(scale);
-        String url = TILESERVER + zoom + "/" + i + "/" + j + ".png";
+        //String url = TILESERVER + zoom + "/" + i + "/" + j + ".png";
+        String url = mapArea.tileTypeProperty().get().getBaseURL() + zoom + "/" + i + "/" + j + ".png";
         if (debug) System.out.println("Creating maptile " + this);
         image = new Image(url, true);
         loading.bind(image.progressProperty().lessThan(1.));
@@ -195,6 +198,5 @@ public class MapTile extends Region {
         setTranslateX(256 * i * sf);
         setTranslateY(256 * j * sf);
     }
-
-
+    
 }

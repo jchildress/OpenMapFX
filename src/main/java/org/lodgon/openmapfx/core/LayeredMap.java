@@ -27,6 +27,8 @@
 package org.lodgon.openmapfx.core;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -44,8 +46,14 @@ public class LayeredMap extends Region {
     private double x0,y0;
     ObservableList<MapLayer> layers = FXCollections.observableArrayList();
     
-    public LayeredMap () {
-        this.mapArea = new MapArea();
+    private final ObjectProperty<TileType> tileType = new SimpleObjectProperty<>();
+    
+    public LayeredMap (ObjectProperty<TileType> tileTypeProperty) {
+        
+        tileType.bind(tileTypeProperty);
+        
+        this.mapArea = new MapArea(tileType);
+        
         this.getChildren().add(mapArea);
         this.layers.addListener(new ListChangeListener<MapLayer>(){
 
