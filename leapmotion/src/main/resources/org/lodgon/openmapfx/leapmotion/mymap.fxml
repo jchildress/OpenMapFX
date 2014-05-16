@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<fx:root id="AnchorPane" prefHeight="220.0" prefWidth="70.0" style="-fx-background-color: null;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+<VBox alignment="CENTER" layoutX="690.0" layoutY="388.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="30.0">
+<children>
+    <BorderPane id="circleXZ" layoutX="200.0" layoutY="107.0" maxHeight="60.0" maxWidth="60.0" prefHeight="60.0" prefWidth="60.0" AnchorPane.bottomAnchor="150.0" AnchorPane.rightAnchor="50.0">
+      <bottom>
+        <ToggleButton id="bottom" fx:id="handXZBottom" maxHeight="8.0" maxWidth="14.0" minHeight="8.0" minWidth="14.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="8.0" prefWidth="14.0" style="" text="" BorderPane.alignment="BOTTOM_CENTER">
+          <BorderPane.margin>
+            <Insets bottom="2.0" />
+          </BorderPane.margin>
+        </ToggleButton>
+      </bottom>
+      <left>
+        <ToggleButton id="left" fx:id="handXZLeft" maxHeight="14.0" maxWidth="8.0" minHeight="14.0" minWidth="8.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="14.0" prefWidth="8.0" selected="false" style="" text="" BorderPane.alignment="CENTER_LEFT">
+          <BorderPane.margin>
+            <Insets left="2.0" />
+          </BorderPane.margin>
+        </ToggleButton>
+      </left>
+      <right>
+        <ToggleButton id="right" fx:id="handXZRight" maxHeight="14.0" maxWidth="8.0" minHeight="14.0" minWidth="8.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="14.0" prefWidth="8.0" style="" text="" BorderPane.alignment="CENTER_RIGHT">
+          <BorderPane.margin>
+            <Insets right="2.0" />
+          </BorderPane.margin>
+        </ToggleButton>
+      </right>
+      <top>
+        <ToggleButton id="top" fx:id="handXZTop" contentDisplay="LEFT" maxHeight="8.0" maxWidth="14.0" minHeight="8.0" minWidth="14.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="8.0" prefWidth="14.0" style="" text="" BorderPane.alignment="TOP_CENTER">
+          <BorderPane.margin>
+            <Insets top="2.0" />
+          </BorderPane.margin>
+        </ToggleButton>
+      </top>
+<center><StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+<children><Line endX="5.0" startX="-5.0" strokeWidth="0.2" />
+<Line endY="5.0" layoutX="31.0" layoutY="31.0" startY="-5.0" strokeWidth="0.2" /><ToggleButton id="handXZ" fx:id="handXZ" minHeight="21.0" minWidth="19.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="21.0" prefWidth="19.0" />
+</children></StackPane>
+</center>
+    </BorderPane>
+<HBox alignment="CENTER" spacing="5.0">
+<children><VBox id="vboxY" alignment="CENTER" layoutX="508.0" layoutY="230.0" maxWidth="25.0" minHeight="140.0" minWidth="25.0" prefHeight="140.0" prefWidth="25.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="65.0">
+<children><Slider fx:id="vSlider" blockIncrement="1.0" majorTickUnit="5.0" max="20.0" minorTickCount="4" mouseTransparent="true" orientation="VERTICAL" rotate="180.0" showTickMarks="true" value="5.0" />
+</children></VBox><VBox id="vboxY" minHeight="140.0" minWidth="25.0" prefHeight="140.0" prefWidth="25.0">
+<children><BorderPane prefHeight="200.0" prefWidth="200.0">
+<top><ToggleButton id="zoomout" fx:id="handYOut" contentDisplay="LEFT" maxHeight="16.0" maxWidth="16.0" minHeight="16.0" minWidth="16.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="16.0" prefWidth="16.0" style="" text="" BorderPane.alignment="CENTER">
+<BorderPane.margin>
+<Insets top="2.0" />
+</BorderPane.margin></ToggleButton>
+</top>
+<bottom><ToggleButton id="zoomin" fx:id="handYIn" maxHeight="16.0" maxWidth="16.0" minHeight="16.0" minWidth="16.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="16.0" prefWidth="16.0" style="" text="" BorderPane.alignment="CENTER">
+<BorderPane.margin>
+<Insets bottom="2.0" />
+</BorderPane.margin></ToggleButton>
+</bottom>
+<center><StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+<children><Line endX="10.0" startX="-10.0" strokeWidth="0.2" translateY="-16.0" />
+<Line endX="10.0" layoutX="23.0" layoutY="71.0" startX="-10.0" strokeWidth="0.2" translateY="16.0" /><ToggleButton id="handY" fx:id="handY" minHeight="9.0" minWidth="19.0" mnemonicParsing="false" mouseTransparent="true" prefHeight="9.0" prefWidth="17.0" />
+</children></StackPane>
+</center></BorderPane>
+</children></VBox>
+</children>
+</HBox>
+</children>
+</VBox>
+  </children>
+  <stylesheets>
+    <URL value="@mymap.css" />
+  </stylesheets>
+</fx:root>
