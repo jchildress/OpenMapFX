@@ -27,6 +27,8 @@
 
 package org.lodgon.openmapfx.providers;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.lodgon.openmapfx.core.TileProvider;
 import org.lodgon.openmapfx.core.TileType;
 
@@ -38,10 +40,10 @@ public class MapQuestTileProvider implements TileProvider {
     
     private static final String providerName = "MapQuest";
     
-    private static final TileType[] tileTypes = new TileType[2];
+    private static final List<TileType> tileTypes = new LinkedList<>();;
     static {
-        tileTypes[0] = new TileType("Map", "http://otile1.mqcdn.com/tiles/1.0.0/map/", "© OpenStreetMap contributors");
-        tileTypes[1] = new TileType("Satellite", "http://otile1.mqcdn.com/tiles/1.0.0/sat/", "Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency");
+        tileTypes.add(new TileType("Map", "http://otile1.mqcdn.com/tiles/1.0.0/map/", "© OpenStreetMap contributors"));
+        tileTypes.add(new TileType("Satellite", "http://otile1.mqcdn.com/tiles/1.0.0/sat/", "Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency"));
     }
     
     public MapQuestTileProvider() {
@@ -53,13 +55,13 @@ public class MapQuestTileProvider implements TileProvider {
     }
 
     @Override
-    public TileType[] getTileTypes() {
+    public List<TileType> getTileTypes() {
         return tileTypes;
     }
     
     @Override
     public TileType getDefaultType() {
-        return tileTypes[1];
+        return tileTypes.get(0);
     }
     
     @Override

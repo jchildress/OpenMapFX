@@ -48,7 +48,7 @@ import javafx.scene.shape.Rectangle;
  *
  * @author johan
  */
-public class MapArea extends Group {
+public class MapArea extends Group implements BaseMap {
 
     /**
      * When the zoom-factor is less than TIPPING below an integer, we will use
@@ -414,6 +414,11 @@ public class MapArea extends Group {
         
         loadTiles();
         
+    }
+
+    @Override
+    public Node getView() {
+        return this;
     }
     
     

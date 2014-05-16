@@ -27,6 +27,8 @@
 
 package org.lodgon.openmapfx.providers;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.lodgon.openmapfx.core.TileProvider;
 import org.lodgon.openmapfx.core.TileType;
 
@@ -38,9 +40,9 @@ public class OSMTileProvider implements TileProvider {
     
     private static final String providerName = "OpenStreetMap";
     
-    private static final TileType[] tileTypes = new TileType[1];
+    private static final List<TileType> tileTypes = new LinkedList<>();
     static {
-        tileTypes[0] = new TileType("Map", "http://tile.openstreetmap.org/", "© OpenStreetMap contributors");
+        tileTypes.add(new TileType("Map", "http://tile.openstreetmap.org/", "© OpenStreetMap contributors"));
     }
     
     public OSMTileProvider() {
@@ -52,13 +54,13 @@ public class OSMTileProvider implements TileProvider {
     }
 
     @Override
-    public TileType[] getTileTypes() {
+    public List<TileType> getTileTypes() {
         return tileTypes;
     }
     
     @Override
     public TileType getDefaultType() {
-        return tileTypes[0];
+        return tileTypes.get(0);
     }
 
     @Override

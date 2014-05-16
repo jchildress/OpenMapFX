@@ -42,19 +42,16 @@ import javafx.scene.layout.Region;
  */
 public class LayeredMap extends Region {
     
-    private final MapArea mapArea;
+    private final BaseMap mapArea;
     private double x0,y0;
-    ObservableList<MapLayer> layers = FXCollections.observableArrayList();
+    private final ObservableList<MapLayer> layers = FXCollections.observableArrayList();
     
-    private final ObjectProperty<TileType> tileType = new SimpleObjectProperty<>();
     
-    public LayeredMap (ObjectProperty<TileType> tileTypeProperty) {
+    public LayeredMap (BaseMapProvider provider) {
+
+        this.mapArea = provider.getBaseMap();
         
-        tileType.bind(tileTypeProperty);
-        
-        this.mapArea = new MapArea(tileType);
-        
-        this.getChildren().add(mapArea);
+        this.getChildren().add(mapArea.getView());
         this.layers.addListener(new ListChangeListener<MapLayer>(){
 
             @Override
@@ -106,7 +103,7 @@ public class LayeredMap extends Region {
      * Return the MapArea that is backing this map 
      * @return the MapArea used as the geomap for this layeredmap
      */
-    public MapArea getMapArea () {
+    public BaseMap getMapArea () {
         return this.mapArea;
     }
     
@@ -144,7 +141,7 @@ public class LayeredMap extends Region {
      * @return the horizontal translation of the backing map
      */
     public DoubleProperty xShiftProperty () {
-        return this.mapArea.translateXProperty();
+        return this.mapArea.getView().translateXProperty();
     }
     
     /**
@@ -152,7 +149,7 @@ public class LayeredMap extends Region {
      * @return the vertical translation of the backing map
      */
     public DoubleProperty yShiftProperty () {
-        return this.mapArea.translateYProperty();
+        return this.mapArea.getView().translateYProperty();
     }
     
     public DoubleProperty centerLongitudeProperty() {

@@ -15,6 +15,8 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import org.lodgon.openmapfx.core.BaseMapProvider;
+import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 import org.lodgon.openmapfx.core.TileProvider;
 import org.lodgon.openmapfx.core.TileType;
 
@@ -28,16 +30,18 @@ public class SimpleProviderPicker extends HBox {
     private final HBox buttonBox;
     
     private final ObjectProperty<TileType> selectedTileType = new SimpleObjectProperty<>();
+    private final DefaultBaseMapProvider provider;
     
-    public SimpleProviderPicker(TileProvider[] providers) {
+    public SimpleProviderPicker(DefaultBaseMapProvider provider) {
         super(4);
         this.setStyle("-fx-padding:4px");
+        this.provider = provider;
         
-        if (providers == null || providers.length == 0) {
+        if (provider.getTileProviders().isEmpty()) {
             throw new IllegalArgumentException("Providers array passed to SimpleProviderPicker cannot be null or empty.");
         }
         
-        cmbProviders = new ComboBox<>(FXCollections.observableArrayList(providers));
+        cmbProviders = new ComboBox<>(FXCollections.observableArrayList(provider.getTileProviders()));
         cmbProviders.valueProperty().addListener((ObservableValue<? extends TileProvider> obs, TileProvider o, TileProvider n) -> {
             setCurrentTileProvider(n);
         });
@@ -46,7 +50,8 @@ public class SimpleProviderPicker extends HBox {
         
         getChildren().addAll(cmbProviders, buttonBox);
         
-        cmbProviders.getSelectionModel().select(providers[0]);
+        cmbProviders.getSelectionModel().select(provider.getTileProviders().get(0));
+        provider.tileTypeProperty().bind(selectedTileType);
         
     }
     

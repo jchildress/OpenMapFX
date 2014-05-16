@@ -33,7 +33,7 @@ package org.lodgon.openmapfx.core;
  *
  * @author Geoff Capper
  */
-public class TileType {
+public class TileType implements MapStyleType {
     
     private final String typeName;
     private final String baseURL;
