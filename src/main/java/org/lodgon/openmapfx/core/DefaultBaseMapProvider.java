@@ -32,6 +32,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.lodgon.openmapfx.providers.MapQuestTileProvider;
 import org.lodgon.openmapfx.providers.OSMTileProvider;
+import org.lodgon.openmapfx.providers.StamenTileProvider;
 
 /**
  *
@@ -47,6 +48,7 @@ public class DefaultBaseMapProvider implements BaseMapProvider {
     static {
         tileProviders.add(new MapQuestTileProvider());
         tileProviders.add(new OSMTileProvider());
+		tileProviders.add(new StamenTileProvider());
     }
     
     private final ObjectProperty<TileProvider> tileProvider = new SimpleObjectProperty<>();
