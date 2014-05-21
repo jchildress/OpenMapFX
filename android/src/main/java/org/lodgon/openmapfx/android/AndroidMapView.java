@@ -57,6 +57,7 @@ import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
+import org.lodgon.openmapfx.service.miataru.Communicator;
 
 // import org.scenicview.ScenicView;
 
@@ -94,7 +95,9 @@ public class AndroidMapView extends Application {
                 @Override
                 public void invalidated(Observable observable) {
                     Position p = positionService.positionProperty().get();
+                    System.out.println("Mapview got new position: "+p);
                     positionLayer.updatePosition(p.getLatitude(), p.getLongitude());
+                    Communicator.updateLocation("johan", p.getLatitude(), p.getLongitude());
                 }
             });
         } else {

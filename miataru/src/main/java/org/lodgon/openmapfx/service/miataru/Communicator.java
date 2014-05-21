@@ -54,7 +54,7 @@ public class Communicator {
 //                }
 //            });
 //    }
-    public static void updateLocation(String deviceName, double lon, double lat) {
+    public static void updateLocation(String deviceName, double lat, double lon) {
         if (deviceName.isEmpty()) {
             deviceName = "anonymous android user";
         }
