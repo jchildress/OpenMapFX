@@ -44,6 +44,16 @@ project (':leapmotion') {
     }
 }
 
+project (':miataru') {
+  repositories {
+      mavenCentral()
+  }
+    dependencies {
+            compile group:'org.codehaus.jackson', name:'jackson-mapper-asl', version:'1.9.9'
+            compile group:'org.javafxdata', name:'datafx-core', version:'2.0.2'
+    }
+}
+
 project (':android') {
     def sdkloc = ""
     def javafxsdkloc = ""
@@ -86,10 +96,10 @@ project (':android') {
 // apparently, configuration might go wrong even if task is not executed?
         if (project.hasProperty('ANDROIDSDK')) {
             println 'creating native directories'
-            def localprop = new File ('android/native/local.properties')
+            def localprop = new File (project.projectDir.getAbsolutePath()+'/native/local.properties');
             def text = 'sdk.dir='+sdkloc+'\n'
             localprop.text = text;
-            def antprop = new File('android/native/ant.properties');
+            def antprop = new File(project.projectDir.getAbsolutePath()+'/native/ant.properties');
             def aptext = 'jfx.sdk.absolute.dir='+javafxsdkloc+'\n';
             aptext = aptext + 'jfx.app.absolute.dist.dir='+project.projectDir+'/build/libs\n';
             aptext = aptext + 'isDalvik=true\n';
