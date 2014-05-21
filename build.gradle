@@ -68,6 +68,7 @@ project (':android') {
             compile files("$ANDROIDSDK/platforms/android-19/android.jar");
             compile files("$JAVAFXSDK/rt/lib/ext/jfxdvk.jar");
             compile project(":");
+            compile project(":miataru");
         }
         apply plugin: 'retrolambda'
     }
@@ -75,6 +76,10 @@ project (':android') {
         doLast {
             copy {
                 from ("../build/classes/main")
+                into ("build/retrolambda/main")
+            }
+            copy {
+                from ("../miataru/build/classes/main")
                 into ("build/retrolambda/main")
             }
             println 'classes copied';
