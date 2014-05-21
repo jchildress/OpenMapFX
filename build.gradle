@@ -86,8 +86,22 @@ project (':android') {
         }
     }
 
+task copydeps(type: Sync) {
+    from configurations.runtime
+    into "$buildDir/libs"
+println('copying: '+configurations.runtime);
+}
     jar {
         archiveName 'openmapfx-android.jar'
+        doLast {
+println('copy deps');
+            copy { 
+    from configurations.runtime
+    into "$buildDir/libs"
+exclude 'android.jar','jfxdvk.jar'
+            }
+println('copy deps done');
+        }
     }
     clean {
         doLast {
