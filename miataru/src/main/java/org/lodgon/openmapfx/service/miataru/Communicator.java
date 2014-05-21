@@ -20,9 +20,9 @@ import org.datafx.reader.converter.JsonConverter;
 public class Communicator {
 
 //    private static String SERVER = "http://192.168.1.6:8080/miataru/v1";
-   // private static String SERVER = "http://service.miataru.com/v1";
+    private static String SERVER = "http://service.miataru.com/v1";
    // private static String SERVER = "http://localhost:8080/miataru/v1";
-    private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
+  //  private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
 //
 //    public static void retrieveLocation (Device device) {
 //        GetLocation gl = new GetLocation().device(device.getName());
@@ -58,7 +58,7 @@ public class Communicator {
         if (deviceName.isEmpty()) {
             deviceName = "anonymous android user";
         }
-        System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat);
+        System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat+", server = "+SERVER);
         try {
             Config c = new Config().enableLocationHistory("True").locationDataRetentionTime("15");
             Location l = new Location().device(deviceName).timestamp(Long.toString(System.currentTimeMillis()/1000))

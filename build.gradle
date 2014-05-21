@@ -55,6 +55,8 @@ project (':miataru') {
 }
 
 project (':android') {
+    apply plugin: 'application'
+    mainClassName = "org.lodgon.openmapfx.android.AndroidMapView"
     def sdkloc = ""
     def javafxsdkloc = ""
     repositories {

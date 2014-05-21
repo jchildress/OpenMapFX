@@ -174,6 +174,7 @@ public class AndroidMapView extends Application {
                             @Override
                             public void run() {
                                 layeredMap.setCenter(lat, lon);
+                    Communicator.updateLocation("johan", lat, lon);
 
                             }
                         });

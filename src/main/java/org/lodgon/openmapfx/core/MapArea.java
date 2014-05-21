@@ -88,11 +88,13 @@ public class MapArea extends Group implements BaseMap {
         area.translateXProperty().bind(translateXProperty().multiply(-1));
         area.translateYProperty().bind(translateYProperty().multiply(-1));
         this.sceneProperty().addListener(i -> {
-            area.widthProperty().bind(getScene().widthProperty().add(20));
-            area.heightProperty().bind(getScene().heightProperty().add(20));
-            if (abortedTileLoad) {
-                abortedTileLoad = false;
-                setCenter(lat, lon);
+            if (getScene() != null) {
+                area.widthProperty().bind(getScene().widthProperty().add(20));
+                area.heightProperty().bind(getScene().heightProperty().add(20));
+                if (abortedTileLoad) {
+                    abortedTileLoad = false;
+                    setCenter(lat, lon);
+                }
             }
         });
         zoomProperty.addListener((ov, t, t1)
