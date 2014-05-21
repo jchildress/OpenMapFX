@@ -35,6 +35,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 import org.lodgon.openmapfx.core.LayeredMap;
+import org.lodgon.openmapfx.core.LicenceLayer;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.TileProvider;
 
@@ -45,6 +46,8 @@ public class MapView extends Application {
     TileProvider[] tileProviders;
     SimpleProviderPicker spp;
     
+	LicenceLayer licenceLayer;
+	
     /**
      * @param args the command line arguments
      */
@@ -78,6 +81,9 @@ public class MapView extends Application {
         map.setZoom(4);
         map.setCenter(50.2, 4.2);
         showMyLocation();
+		
+		licenceLayer = new LicenceLayer(provider);
+        map.getLayers().add(licenceLayer);
     }
     
     

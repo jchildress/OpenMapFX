@@ -51,8 +51,9 @@ public class SimpleProviderPicker extends HBox {
         getChildren().addAll(cmbProviders, buttonBox);
         
         cmbProviders.getSelectionModel().select(provider.getTileProviders().get(0));
+        provider.tileProviderProperty().bind(cmbProviders.getSelectionModel().selectedItemProperty());//set(tp);
         provider.tileTypeProperty().bind(selectedTileType);
-        
+		
     }
     
     private void setCurrentTileProvider(TileProvider tp) {

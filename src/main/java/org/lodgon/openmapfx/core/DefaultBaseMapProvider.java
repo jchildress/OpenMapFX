@@ -52,7 +52,7 @@ public class DefaultBaseMapProvider implements BaseMapProvider {
     }
     
     private final ObjectProperty<TileProvider> tileProvider = new SimpleObjectProperty<>();
-    private final ObjectProperty<TileType> selectedTileType = new SimpleObjectProperty<>();
+    private final ObjectProperty<MapTileType> selectedTileType = new SimpleObjectProperty<>();
     
     public DefaultBaseMapProvider() {
         tileProvider.set(tileProviders.get(0));
@@ -79,18 +79,29 @@ public class DefaultBaseMapProvider implements BaseMapProvider {
 //        return tileProvider.get().getTileTypes();
 //    }
     
+	@Override
     public List<TileProvider> getTileProviders() {
         return tileProviders;
     }
     
-    public ObjectProperty<TileType> tileTypeProperty() {
+    @Override
+    public ObjectProperty<MapTileType> tileTypeProperty() {
         return selectedTileType;
     }
 
     @Override
-    public List<TileType> getSupportedMapStyles() {
-        
+    public List<TileType> getTileTypes() {
         return tileProvider.get().getTileTypes();
+    }
+    
+    @Override
+    public String toString() {
+        return getMapName();
+    }
+
+    @Override
+    public ObjectProperty<TileProvider> tileProviderProperty() {
+        return tileProvider;
     }
     
 }

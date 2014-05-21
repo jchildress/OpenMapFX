@@ -27,6 +27,7 @@
 package org.lodgon.openmapfx.core;
 
 import java.util.List;
+import javafx.beans.property.ObjectProperty;
 
     
 /** 
@@ -51,9 +52,31 @@ public interface BaseMapProvider {
      */
     public BaseMap getBaseMap();
     
-    /** *  Supported {@link MapStyleType}s that can be shown by this type of map.
+	/** Supplies a potentially empty list of {@link TileProvider}s that can 
+	 * supply tiles for this map.
+	 * 
+	 * @return 
+	 */
+	public List<? extends TileProvider> getTileProviders();
+	
+    /**  Supported {@link MapTileType}s that can be shown by this type of map.
      * 
      * @return 
      */
-    public List<? extends MapStyleType> getSupportedMapStyles();
+    public List<? extends MapTileType> getTileTypes();
+    
+    /** A property that can be bound to a UI control then used to switch the 
+     * base map in the {@link LayeredMap}
+     * 
+     * @return 
+     */
+    public ObjectProperty<TileProvider> tileProviderProperty();
+    
+    /** A property that can be bound to a UI control and then used to switch 
+     * the tile type in the {@link LayeredMap}
+     * 
+     * @return 
+     */
+    public ObjectProperty<MapTileType> tileTypeProperty();
+	
 }

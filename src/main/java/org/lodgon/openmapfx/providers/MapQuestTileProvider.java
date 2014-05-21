@@ -66,7 +66,8 @@ public class MapQuestTileProvider implements TileProvider {
     
     @Override
     public String getAttributionNotice() {
-        return "<p>Tiles Courtesy of <a href=\"http://www.mapquest.com/\" target=\"_blank\">MapQuest</a> <img src=\"http://developer.mapquest.com/content/osm/mq_logo.png\"></p>";
+        //return "Tiles Courtesy of <a href=\"http://www.mapquest.com/\" target=\"_blank\">MapQuest</a> <img src=\"http://developer.mapquest.com/content/osm/mq_logo.png\">";
+        return "Tiles Courtesy of MapQuest (http://www.mapquest.com/)";
     }
     
     @Override
