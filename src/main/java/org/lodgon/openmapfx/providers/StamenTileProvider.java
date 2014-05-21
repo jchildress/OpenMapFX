@@ -36,17 +36,18 @@ import org.lodgon.openmapfx.core.TileType;
  *
  * @author Geoff Capper
  */
-public class MapQuestTileProvider implements TileProvider {
+public class StamenTileProvider implements TileProvider {
     
-    private static final String providerName = "MapQuest";
+    private static final String providerName = "Stamen";
     
     private static final List<TileType> tileTypes = new LinkedList<>();;
     static {
-        tileTypes.add(new TileType("Map", "http://otile1.mqcdn.com/tiles/1.0.0/map/", "© OpenStreetMap contributors"));
-        tileTypes.add(new TileType("Satellite", "http://otile1.mqcdn.com/tiles/1.0.0/sat/", "Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency"));
+        tileTypes.add(new TileType("Watercolor", "http://tile.stamen.com/watercolor/", "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA."));
+        tileTypes.add(new TileType("Toner", "http://tile.stamen.com/toner/", "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA."));
+        tileTypes.add(new TileType("Terrain", "http://tile.stamen.com/terrain/", "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA."));
     }
     
-    public MapQuestTileProvider() {
+    public StamenTileProvider() {
     }
     
     @Override
@@ -66,8 +67,8 @@ public class MapQuestTileProvider implements TileProvider {
     
     @Override
     public String getAttributionNotice() {
-        //return "Tiles Courtesy of <a href=\"http://www.mapquest.com/\" target=\"_blank\">MapQuest</a> <img src=\"http://developer.mapquest.com/content/osm/mq_logo.png\">";
-        return "Tiles Courtesy of MapQuest (http://www.mapquest.com/)";
+        //return "Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, under <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a>. Data by <a href=\"http://openstreetmap.org\">OpenStreetMap</a>, under <a href=\"http://creativecommons.org/licenses/by-sa/3.0\">CC BY SA</a>.";
+        return "Map tiles by Stamen Design (http://stamen.com/), under CC BY 3.0. Data by OpenStreetMap (http://openstreetmap.org/), under CC BY SA.";
     }
     
     @Override

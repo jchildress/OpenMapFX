@@ -34,14 +34,27 @@ package org.lodgon.openmapfx.core;
  *
  * @author Geoff Capper
  */
-public interface MapStyleType {
+public interface MapTileType {
     
-    /** 
-     * 
-     * The display name for this style of map, for use in the user interface.
+    /** The display name for this style of map, for use in the user interface.
      * 
      * @return 
      */
     public String getTypeName();
     
+	/** Returns the base URL for obtaining this type of tile from the tile provider. 
+     * For implementations that don't use a tile provider this can return null.
+     * 
+     * @return The base URL, ending in a forward slash so that zoom and location 
+     * can be appended directly, or null.
+     */
+    public String getBaseURL();
+    
+    /** An attribution for the tiles, to cover situations where copyright 
+     * requires displaying a notice based on the type of tile displayed.
+     * 
+     * @return 
+     */
+    public String getAttributionNotice();
+	
 }
