@@ -75,9 +75,9 @@ public class MapArea extends Group implements BaseMap {
     private DoubleProperty centerLon = new SimpleDoubleProperty();
     private DoubleProperty centerLat = new SimpleDoubleProperty();
     
-    private final ObjectProperty<TileType> tileType = new SimpleObjectProperty<>();
+    private final ObjectProperty<MapTileType> tileType = new SimpleObjectProperty<>();
     
-    public MapArea(ObjectProperty<TileType> tileType) {
+    public MapArea(ObjectProperty<MapTileType> tileType) {
         this.tileType.bind(tileType);
         
         for (int i = 0; i < tiles.length; i++) {
@@ -98,14 +98,14 @@ public class MapArea extends Group implements BaseMap {
         zoomProperty.addListener((ov, t, t1)
                 -> nearestZoom = (Math.min((int) floor(t1.doubleValue() + TIPPING), MAX_ZOOM - 1)));
         
-        this.tileType.addListener((ObservableValue<? extends TileType> obs, TileType o, TileType n) -> {
+        this.tileType.addListener((ObservableValue<? extends MapTileType> obs, MapTileType o, MapTileType n) -> {
             System.out.println("TileType was changed.");
             reloadTiles();
         });
 
     }
     
-    public ObjectProperty<TileType> tileTypeProperty() {
+    public ObjectProperty<MapTileType> tileTypeProperty() {
         return tileType;
     }
     

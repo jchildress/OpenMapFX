@@ -33,7 +33,7 @@ package org.lodgon.openmapfx.core;
  *
  * @author Geoff Capper
  */
-public class TileType implements MapStyleType {
+public class TileType implements MapTileType {
     
     private final String typeName;
     private final String baseURL;
@@ -55,6 +55,7 @@ public class TileType implements MapStyleType {
      * 
      * @return 
      */
+	@Override
     public String getTypeName() {
         return typeName;
     }
@@ -64,10 +65,12 @@ public class TileType implements MapStyleType {
      * @return The base URL, ending in a forward slash so that zoom and location 
      * can be appended directly.
      */
+	@Override
     public String getBaseURL() {
         return baseURL;
     }
     
+	@Override
     public String getAttributionNotice() {
         return attributionNotice;
     }
