@@ -27,67 +27,41 @@
 package org.lodgon.openmapfx.android;
 
 import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
-import android.os.Looper;
-import android.provider.Settings;
-import android.view.animation.Animation;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafxports.android.FXActivity;
+import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 import org.lodgon.openmapfx.core.LayeredMap;
+import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
-import org.lodgon.openmapfx.core.TileProvider;
-import org.lodgon.openmapfx.core.TileType;
-import org.lodgon.openmapfx.providers.OSMTileProvider;
+import org.lodgon.openmapfx.core.PositionService;
+import org.lodgon.openmapfx.service.miataru.Communicator;
 
 // import org.scenicview.ScenicView;
 
-public class AndroidMapView extends Application implements LocationListener{
+public class AndroidMapView extends Application {
     
     private LocationManager lm;
     private String provider;
@@ -99,6 +73,7 @@ public class AndroidMapView extends Application implements LocationListener{
     private Stage stage;
     private final int STARTZOOM = 14;
     private boolean debug = true;
+    private PositionService positionService;
     
     @Override
     public void start(Stage primaryStage) {
@@ -107,44 +82,24 @@ public class AndroidMapView extends Application implements LocationListener{
         this.stage = primaryStage;
         double lat = 50.8456;
         double lon = 4.7238;
-        TileProvider osm = new OSMTileProvider();
-        ObjectProperty<TileType> typeProperty = new SimpleObjectProperty<>(osm.getDefaultType());
-        layeredMap = new LayeredMap(typeProperty);
+                DefaultBaseMapProvider mapProvider = new DefaultBaseMapProvider();
+
+        layeredMap = new LayeredMap(mapProvider);
         layeredMap.setZoom(14);
         if (real) {
-            Context ctx = FXActivity.getInstance();
+            positionService = new AndroidPositionService();
            
-            Object systemService = ctx.getSystemService(FXActivity.LOCATION_SERVICE);
-            lm = (LocationManager) systemService;
-            List<String> providers = lm.getAllProviders();
-            if ((providers != null) && (providers.size() > 0)) {
-                this.provider = providers.get(providers.size() - 1);
-            }
-            boolean enabled = lm
-                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-            if (!enabled) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                ctx.startActivity(intent);
-            }
-            Location loc = lm.getLastKnownLocation(provider);
-            if (loc != null) {
-                lat = loc.getLatitude();
-                lon = loc.getLongitude();
-            } else {
-                lat = 0;
-                lon = 0;
-            }
-            Thread t = new Thread() {
-                public void run() {
-                    Looper.prepare();
-                    lm.requestLocationUpdates(provider, 400, 1, AndroidMapView.this);
-                    Looper.loop();
-                }
-            };
-            System.out.println("[JVDBG] START LOCATIONUPDATER");
-            t.start();
             showMyLocation();
+            positionService.positionProperty().addListener(new InvalidationListener() {
+
+                @Override
+                public void invalidated(Observable observable) {
+                    Position p = positionService.positionProperty().get();
+                    System.out.println("Mapview got new position: "+p);
+                    positionLayer.updatePosition(p.getLatitude(), p.getLongitude());
+                    Communicator.updateLocation("johan", p.getLatitude(), p.getLongitude());
+                }
+            });
         } else {
             fakeUpdates();
         }
@@ -255,41 +210,7 @@ public class AndroidMapView extends Application implements LocationListener{
         positionLayer = new PositionLayer(image);
         layeredMap.getLayers().add(positionLayer);
     }
-    @Override
-    public void onLocationChanged(Location loc) {
-        if (debug) System.out.println("[JVDBG] GOT NEW LOC: " + loc);
-        if (loc != null) {
-            final double lat = loc.getLatitude();
-            final double lon = loc.getLongitude();
-            
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (debug) System.out.println("center map to "+lat+", "+lon);
-                  if (positionLayer != null) {
-                    positionLayer.updatePosition(lat, lon);
-                  }
-                //    layeredMap.setCenter(lat, lon);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String v, int i, Bundle bundle) {
-        System.out.println("Status changed for " + v + " to " + i + " by " + bundle);
-    }
-
-    @Override
-    public void onProviderEnabled(String v) {
-        System.out.println("PROVIDER ENABLED: " + v);
-    }
-
-    @Override
-    public void onProviderDisabled(String v) {
-        System.out.println("PROVIDER DISABLED: " + v);
-    }
-
+   
     private String getDeviceName(Context ctx) {
         try {
             FileInputStream openFileInput = ctx.openFileInput("mydevice");
