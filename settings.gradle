@@ -1,0 +1,2 @@
+rootProject.name = 'OpenMapFX'
+include 'leapmotion', 'android', 'miataru'
