@@ -87,7 +87,7 @@ public class AndroidMapView extends Application {
         layeredMap = new LayeredMap(mapProvider);
         layeredMap.setZoom(14);
         if (real) {
-            positionService = new AndroidPositionService();
+            positionService = PositionService.getInstance();//new AndroidPositionService();
            
             showMyLocation();
             positionService.positionProperty().addListener(new InvalidationListener() {

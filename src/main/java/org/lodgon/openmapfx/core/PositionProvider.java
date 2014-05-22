@@ -24,42 +24,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.lodgon.openmapfx.core;
 
-import java.util.Iterator;
-import java.util.ServiceLoader;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+package org.lodgon.openmapfx.core;
 
 /**
  *
  * @author johan
  */
-public class PositionService {
+public interface PositionProvider {
     
-    private static PositionService instance;
-    private ServiceLoader<PositionProvider> loader;
-    
-    private final ObjectProperty<Position> positionProperty = new SimpleObjectProperty<>();
-    
-    private PositionService() {
-        System.out.println("Loading PositionService");
-        loader = ServiceLoader.load(PositionProvider.class);
-        Iterator<PositionProvider> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            System.out.println("Implementation: "+iterator.next());
-        }
-        System.out.println("Loading PositionService done");
-    }
-    
-    public static PositionService getInstance() {
-        if (instance == null) {
-            instance = new PositionService();
-        }
-        return instance;
-    }
-    
-    public ObjectProperty<Position> positionProperty () {
-        return positionProperty;
-    }
 }

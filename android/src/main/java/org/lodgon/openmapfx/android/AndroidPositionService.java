@@ -39,13 +39,14 @@ import java.util.List;
 import javafx.application.Platform;
 import javafxports.android.FXActivity;
 import org.lodgon.openmapfx.core.Position;
+import org.lodgon.openmapfx.core.PositionProvider;
 import org.lodgon.openmapfx.core.PositionService;
 
 /**
  *
  * @author johan
  */
-public class AndroidPositionService extends PositionService implements LocationListener {
+public class AndroidPositionService implements PositionProvider, LocationListener {
     private final LocationManager lm;
     private String provider;
     private final double lat;
@@ -99,7 +100,7 @@ public class AndroidPositionService extends PositionService implements LocationL
                 public void run() {
                     if (debug) System.out.println("retrieved new positoin: "+mylat+", "+mylon);
                     Position pos = new Position(mylat, mylon);
-                    AndroidPositionService.this.positionProperty().set(pos);
+                  //  AndroidPositionService.this.positionProperty().set(pos);
             
                 }
             });
