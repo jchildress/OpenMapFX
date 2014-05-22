@@ -1,5 +1,8 @@
 allprojects {
     apply plugin: 'java'
+    repositories {
+        mavenCentral()
+    }
 }
 apply plugin: 'application'
 
@@ -45,13 +48,20 @@ project (':leapmotion') {
 }
 
 project (':miataru') {
-  repositories {
-      mavenCentral()
-  }
     dependencies {
             compile group:'org.codehaus.jackson', name:'jackson-mapper-asl', version:'1.9.9'
             compile group:'org.javafxdata', name:'datafx-core', version:'2.0.2'
+            compile project(":");
     }
+}
+
+project (':desktop') {
+    dependencies {
+        compile project(":");
+        compile project(":miataru");
+    }
+    apply plugin: 'application'
+    mainClassName = "org.lodgon.openmapfx.desktop.MapView"
 }
 
 project (':android') {
@@ -88,21 +98,18 @@ project (':android') {
         }
     }
 
-task copydeps(type: Sync) {
-    from configurations.runtime
-    into "$buildDir/libs"
-println('copying: '+configurations.runtime);
-}
+    task copydeps(type: Sync) {
+        from configurations.runtime
+        into "$buildDir/libs"
+    }
     jar {
         archiveName 'openmapfx-android.jar'
         doLast {
-println('copy deps');
             copy { 
-    from configurations.runtime
-    into "$buildDir/libs"
-exclude 'android.jar','jfxdvk.jar'
+                from configurations.runtime
+                into "$buildDir/libs"
+                exclude 'android.jar','jfxdvk.jar'
             }
-println('copy deps done');
         }
     }
     clean {

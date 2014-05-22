@@ -24,42 +24,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.lodgon.openmapfx.core;
+package org.lodgon.openmapfx.service.miataru;
 
-import java.util.Iterator;
-import java.util.ServiceLoader;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import org.lodgon.openmapfx.core.PositionService;
+import org.lodgon.openmapfx.service.OpenMapFXService;
 
 /**
  *
  * @author johan
  */
-public class PositionService {
+public class MiataruService implements OpenMapFXService {
+
+    private PositionService positionService;
     
-    private static PositionService instance;
-    private ServiceLoader<PositionProvider> loader;
-    
-    private final ObjectProperty<Position> positionProperty = new SimpleObjectProperty<>();
-    
-    private PositionService() {
-        System.out.println("Loading PositionService");
-        loader = ServiceLoader.load(PositionProvider.class);
-        Iterator<PositionProvider> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            System.out.println("Implementation: "+iterator.next());
-        }
-        System.out.println("Loading PositionService done");
+    @Override
+    public String getName() {
+        return "Miataru";
+    }
+
+    @Override
+    public Node getMenu() {
+        HBox menu = new HBox();
+        menu.getChildren().add(new Label ("MENU"));
+        return menu;
     }
     
-    public static PositionService getInstance() {
-        if (instance == null) {
-            instance = new PositionService();
-        }
-        return instance;
+    @Override
+    public void activate() {
+        System.out.println("Activate miataruService");
+        positionService = PositionService.getInstance();
     }
     
-    public ObjectProperty<Position> positionProperty () {
-        return positionProperty;
-    }
 }
