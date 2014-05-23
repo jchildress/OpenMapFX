@@ -39,15 +39,22 @@ public class PositionService {
     
     private static PositionService instance;
     private ServiceLoader<PositionProvider> loader;
+    private PositionProvider positionProvider;
     
-    private final ObjectProperty<Position> positionProperty = new SimpleObjectProperty<>();
+    private ObjectProperty<Position> positionProperty;
     
     private PositionService() {
         System.out.println("Loading PositionService");
         loader = ServiceLoader.load(PositionProvider.class);
         Iterator<PositionProvider> iterator = loader.iterator();
         while (iterator.hasNext()) {
-            System.out.println("Implementation: "+iterator.next());
+            if (positionProvider == null) {
+                positionProvider = iterator.next();
+                System.out.println("We will use this positionprovider: "+positionProvider);
+                positionProperty = positionProvider.getPositionProperty();
+            } else {
+                System.out.println("Ignoring positionprovider "+iterator.next());
+            }
         }
         System.out.println("Loading PositionService done");
     }

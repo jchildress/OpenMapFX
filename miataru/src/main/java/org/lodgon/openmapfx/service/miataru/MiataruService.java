@@ -26,9 +26,13 @@
  */
 package org.lodgon.openmapfx.service.miataru;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionService;
 import org.lodgon.openmapfx.service.OpenMapFXService;
 
@@ -39,6 +43,7 @@ import org.lodgon.openmapfx.service.OpenMapFXService;
 public class MiataruService implements OpenMapFXService {
 
     private PositionService positionService;
+    private ObjectProperty<Position> positionProperty;
     
     @Override
     public String getName() {
@@ -56,6 +61,14 @@ public class MiataruService implements OpenMapFXService {
     public void activate() {
         System.out.println("Activate miataruService");
         positionService = PositionService.getInstance();
+        positionProperty = positionService.positionProperty();
+        positionProperty.addListener(new InvalidationListener() {
+
+            @Override
+            public void invalidated(Observable observable) {
+                System.out.println("new position: "+positionProperty.get());
+            }
+        });
     }
     
 }
