@@ -58,6 +58,7 @@ import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
 import org.lodgon.openmapfx.service.miataru.Communicator;
+import org.lodgon.openmapfx.service.miataru.MiataruService;
 
 // import org.scenicview.ScenicView;
 
@@ -86,6 +87,9 @@ public class AndroidMapView extends Application {
 
         layeredMap = new LayeredMap(mapProvider);
         layeredMap.setZoom(14);
+        System.out.println("Start miataru");
+        MiataruService miataru = new MiataruService();
+        System.out.println("started miataru");
         if (real) {
             positionService = PositionService.getInstance();//new AndroidPositionService();
            
