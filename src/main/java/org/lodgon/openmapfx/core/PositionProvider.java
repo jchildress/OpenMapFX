@@ -27,10 +27,14 @@
 
 package org.lodgon.openmapfx.core;
 
+import javafx.beans.property.ObjectProperty;
+
 /**
  *
  * @author johan
  */
 public interface PositionProvider {
+    
+    ObjectProperty<Position> getPositionProperty();
     
 }

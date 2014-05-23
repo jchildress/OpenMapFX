@@ -37,6 +37,8 @@ import android.os.Looper;
 import android.provider.Settings;
 import java.util.List;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafxports.android.FXActivity;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionProvider;
@@ -47,6 +49,10 @@ import org.lodgon.openmapfx.core.PositionService;
  * @author johan
  */
 public class AndroidPositionService implements PositionProvider, LocationListener {
+    
+    ObjectProperty<Position> positionProperty = new SimpleObjectProperty<>();
+
+    
     private final LocationManager lm;
     private String provider;
     private final double lat;
@@ -100,6 +106,7 @@ public class AndroidPositionService implements PositionProvider, LocationListene
                 public void run() {
                     if (debug) System.out.println("retrieved new positoin: "+mylat+", "+mylon);
                     Position pos = new Position(mylat, mylon);
+                    positionProperty.set(pos);
                   //  AndroidPositionService.this.positionProperty().set(pos);
             
                 }
@@ -120,6 +127,11 @@ public class AndroidPositionService implements PositionProvider, LocationListene
     @Override
     public void onProviderDisabled(String v) {
         System.out.println("PROVIDER DISABLED: " + v);
+    }
+
+    @Override
+    public ObjectProperty<Position> getPositionProperty() {
+        return positionProperty;
     }
 
 }
