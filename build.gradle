@@ -56,7 +56,8 @@ project (':leapmotion') {
 project (':miataru') {
     dependencies {
             compile group:'org.codehaus.jackson', name:'jackson-mapper-asl', version:'1.9.9'
-            compile group:'org.javafxdata', name:'datasources', version:'8.0.5-SNAPSHOT'
+            // compile group:'org.javafxdata', name:'datasources', version:'8.0.5-SNAPSHOT'
+            compile group:'org.javafxdata', name:'datafx-core', version:'2.0.2'
             compile project(":");
     }
 }
