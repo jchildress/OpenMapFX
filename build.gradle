@@ -1,0 +1,159 @@
+allprojects {
+    apply plugin: 'java'
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
+apply plugin: 'application'
+
+sourceCompatibility = '1.8'
+mainClassName = "org.lodgon.openmapfx.desktop.MapView"
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'org.lodgon.openmapfx.desktop.MapView'
+}
+
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+
+  dependencies {
+     classpath 'me.tatarka:gradle-retrolambda:1.3.0'
+  }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+       testCompile group: 'junit', name: 'junit', version: '4.10'
+}
+
+/******************************************************************************
+ * Project specific configurations                                            *
+ *****************************************************************************/
+
+
+project (':leapmotion') {
+    compileJava.onlyIf{project.hasProperty('LEAPSDK')}
+    if (project.hasProperty('LEAPSDK')) {
+        dependencies {
+            compile files("$LEAPSDK/lib/LeapJava.jar");
+            compile project(":");
+        }
+    }
+    apply plugin: 'application'
+    run.onlyIf{project.hasProperty('LEAPSDK')}
+
+    if (project.hasProperty('LEAPSDK')) {
+        run {
+            main = "org.lodgon.openmapfx.leapmotion.LeapMotionMapView"
+            jvmArgs = [ "-Djava.library.path=$LEAPSDK/lib/x64"]
+        }
+    }
+}
+
+project (':miataru') {
+    dependencies {
+            compile group:'org.codehaus.jackson', name:'jackson-mapper-asl', version:'1.9.9'
+            // compile group:'org.javafxdata', name:'datasources', version:'8.0.5-SNAPSHOT'
+            compile group:'org.javafxdata', name:'datafx-core', version:'2.0.2'
+            compile project(":");
+    }
+}
+
+project (':desktop') {
+    dependencies {
+        compile project(":");
+        compile project(":miataru");
+    }
+    apply plugin: 'application'
+    mainClassName = "org.lodgon.openmapfx.desktop.MapView"
+}
+
+project (':android') {
+    apply plugin: 'application'
+    mainClassName = "org.lodgon.openmapfx.android.AndroidMapView"
+    def sdkloc = ""
+    def javafxsdkloc = ""
+    repositories {
+      mavenCentral()
+    }
+    compileJava.onlyIf{project.hasProperty('ANDROIDSDK')}
+    if (project.hasProperty('ANDROIDSDK')) {
+        sdkloc="$ANDROIDSDK"
+        javafxsdkloc="$JAVAFXSDK"
+        dependencies {
+            compile files("$ANDROIDSDK/platforms/android-19/android.jar");
+            compile files("$JAVAFXSDK/rt/lib/ext/jfxdvk.jar");
+            compile project(":");
+            compile project(":miataru");
+        }
+        apply plugin: 'retrolambda'
+    }
+    classes {
+        doLast {
+            copy {
+                from ("../build/classes/main")
+                into ("build/retrolambda/main")
+            }
+            copy {
+                from ("../miataru/build/classes/main")
+                into ("build/retrolambda/main")
+            }
+            println 'classes copied';
+        }
+    }
+
+    task copydeps(type: Sync) {
+        from configurations.runtime
+        into "$buildDir/libs"
+    }
+    jar {
+        archiveName 'openmapfx-android.jar'
+        doLast {
+            copy { 
+                from configurations.runtime
+                into "$buildDir/libs"
+                exclude 'android.jar','jfxdvk.jar'
+            }
+        }
+    }
+    clean {
+        doLast {
+           File jfxdvk = file('native/libs/jfxdvk.jar');
+           jfxdvk.delete();
+           FileTree armeabidir = fileTree (dir: 'native/libs/armeabi');
+           armeabidir.each{File f -> delete(f)}
+        }
+    }
+    task preparenative(dependsOn: jar)  {
+// apparently, configuration might go wrong even if task is not executed?
+        if (project.hasProperty('ANDROIDSDK')) {
+            println 'creating native directories'
+            def localprop = new File (project.projectDir.getAbsolutePath()+'/native/local.properties');
+            def text = 'sdk.dir='+sdkloc+'\n'
+            localprop.text = text;
+            def antprop = new File(project.projectDir.getAbsolutePath()+'/native/ant.properties');
+            def aptext = 'jfx.sdk.absolute.dir='+javafxsdkloc+'\n';
+            aptext = aptext + 'jfx.app.absolute.dist.dir='+project.projectDir+'/build/libs\n';
+            aptext = aptext + 'isDalvik=true\n';
+            antprop.text = aptext;
+            copy {
+                from javafxsdkloc+'/rt/lib/armeabi'
+                into 'native/libs/armeabi'
+            }
+            copy {
+                from javafxsdkloc+'/rt/lib/ext/jfxdvk.jar'
+                into 'native/libs'
+            }
+            File srcdir = new File('android/native/src');
+            srcdir.mkdir();
+        }
+    }
+    preparenative.onlyIf{project.hasProperty('ANDROIDSDK')}
+}
