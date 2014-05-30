@@ -57,6 +57,7 @@ public class SimpleProviderPicker extends HBox {
     }
     
     private void setCurrentTileProvider(TileProvider tp) {
+        
         buttonBox.getChildren().clear();
         
         final ToggleGroup group = new ToggleGroup();
