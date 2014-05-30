@@ -34,8 +34,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.lodgon.openmapfx.core.BaseMap;
 import org.lodgon.openmapfx.core.MapArea;
 import org.lodgon.openmapfx.core.LayeredMap;
+import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 
 public class LeapMotionMapView extends Application {
 
@@ -46,9 +48,10 @@ public class LeapMotionMapView extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        DefaultBaseMapProvider provider = new DefaultBaseMapProvider();
 
-        LayeredMap map = new LayeredMap();
-        MapArea mapArea = map.getMapArea();
+        LayeredMap map = new LayeredMap(provider);
+       BaseMap mapArea = map.getMapArea();
 
         Label copyright = new Label("(c) OpenStreetMap Contributors");
         Overlay overlay = new Overlay();
@@ -99,7 +102,7 @@ public class LeapMotionMapView extends Application {
                     }
                     overlay.setNavigation(t1);
                 }));
-        mapArea.zoomProperty().addListener((ov, t, t1) -> overlay.setZoom(t1.intValue()));
+        map.zoomProperty().addListener((ov, t, t1) -> overlay.setZoom(t1.intValue()));
     }
 
     @Override
