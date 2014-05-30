@@ -27,10 +27,7 @@
 
 package org.lodgon.openmapfx.core;
 
-/** 
- * 
- * A wrapper to cover styling both tile typed maps and those that offer similar 
- * options in a different way.
+/** Interface that describes a type of map tile.
  *
  * @author Geoff Capper
  */

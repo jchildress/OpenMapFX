@@ -75,4 +75,9 @@ public class TileType implements MapTileType {
         return attributionNotice;
     }
     
+    @Override
+    public String toString() {
+        return getTypeName();
+    }
+    
 }
