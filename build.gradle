@@ -47,9 +47,13 @@ project (':leapmotion') {
         }
     }
     apply plugin: 'application'
-    run {
-        main = "org.lodgon.openmapfx.leapmotion.LeapMotionMapView"
-        jvmArgs = [ "-Djava.library.path=$LEAPSDK/lib/x64"]
+    run.onlyIf{project.hasProperty('LEAPSDK')}
+
+    if (project.hasProperty('LEAPSDK')) {
+        run {
+            main = "org.lodgon.openmapfx.leapmotion.LeapMotionMapView"
+            jvmArgs = [ "-Djava.library.path=$LEAPSDK/lib/x64"]
+        }
     }
 }
 

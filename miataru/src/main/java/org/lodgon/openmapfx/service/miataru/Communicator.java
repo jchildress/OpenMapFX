@@ -11,8 +11,8 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import org.datafx.provider.ObjectDataProvider;
 import org.datafx.provider.ObjectDataProviderBuilder;
-import org.datafx.io.RestSourceBuilder;
-import org.datafx.io.converter.JsonConverter;
+import org.datafx.reader.RestSourceBuilder;
+import org.datafx.reader.converter.JsonConverter;
 
 /**
  *
