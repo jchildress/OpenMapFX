@@ -75,18 +75,20 @@ public class PositionLayer extends Parent implements MapLayer {
      protected void refreshLayer() {
         Point2D cartPoint = this.layeredMap.getMapPoint(lat, lon);
         if (cartPoint == null) {
-            System.out.println("[JVDBG] Null cardpoint, probably no scene, dont show.");
+            System.out.println("[JVDBG] Null cartpoint, probably no scene, dont show.");
             return;
         }
         imageView.setVisible(true);
         imageView.setTranslateX(cartPoint.getX() - imageWidth/2);
-        imageView.setTranslateY(cartPoint.getY()- imageHeight/2);
+        imageView.setTranslateY(cartPoint.getY() - imageHeight/2);
     }
 
     @Override
     public void gotLayeredMap(LayeredMap map) {
         this.layeredMap = map;
         this.layeredMap.zoomProperty().addListener(e -> refreshLayer());
+        this.layeredMap.centerLatitudeProperty().addListener(e -> refreshLayer());
+        this.layeredMap.centerLongitudeProperty().addListener(e -> refreshLayer());
         this.layeredMap.xShiftProperty().addListener(e -> refreshLayer());
         this.layeredMap.yShiftProperty().addListener(e -> refreshLayer());
         refreshLayer();

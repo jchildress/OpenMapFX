@@ -27,6 +27,8 @@
 package org.lodgon.openmapfx.core;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -40,14 +42,15 @@ import javafx.scene.layout.Region;
  */
 public class LayeredMap extends Region {
     
-    private final BaseMap mapArea;
+    private BaseMap mapArea;
     private double x0,y0;
     private final ObservableList<MapLayer> layers = FXCollections.observableArrayList();
+    private ObjectProperty<BaseMapProvider> provider = new SimpleObjectProperty<>();
     
-    
-    public LayeredMap (BaseMapProvider provider) {
-
+    public LayeredMap(BaseMapProvider provider) {
+        this.provider.set(provider);
         this.mapArea = provider.getBaseMap();
+        this.mapArea.install();
         
         this.getChildren().add(mapArea.getView());
         this.layers.addListener(new ListChangeListener<MapLayer>(){
@@ -81,6 +84,37 @@ public class LayeredMap extends Region {
             mapArea.zoom(t.getZoomFactor()> 1? .1: -.1, t.getSceneX(),t.getSceneY());
         } );
         setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()) );
+    }
+    
+    public void setBaseMapProvider(BaseMapProvider provider) {
+        this.provider.set(provider);
+        resetBaseMap();
+    }
+    
+    private void resetBaseMap() {
+        
+        double zm = zoomProperty().get();
+        double lat = centerLatitudeProperty().get();
+        double lng = centerLongitudeProperty().get();
+        
+        mapArea.uninstall();
+        this.getChildren().remove(mapArea.getView());
+        this.mapArea = provider.get().getBaseMap();
+        this.getChildren().add(0, mapArea.getView());
+        this.mapArea.install();
+        
+        this.mapArea.setZoom(zm);
+        this.mapArea.setCenter(lat, lng);
+        
+        synchronized(layers) {
+            for (MapLayer ml : layers) {
+                ml.gotLayeredMap(this);
+            }
+        }
+        
+//        this.mapArea.minHeightProperty().bind(map.heightProperty());
+//		this.mapArea.minWidthProperty().bind(map.widthProperty());
+        
     }
     
     /**

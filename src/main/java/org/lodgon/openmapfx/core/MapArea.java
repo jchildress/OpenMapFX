@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -77,6 +79,8 @@ public class MapArea extends Group implements BaseMap {
     
     private final ObjectProperty<MapTileType> tileType = new SimpleObjectProperty<>();
     
+    private InvalidationListener sceneListener;
+    
     public MapArea(ObjectProperty<MapTileType> tileType) {
         this.tileType.bind(tileType);
         
@@ -85,24 +89,29 @@ public class MapArea extends Group implements BaseMap {
         }
         area = new Rectangle(-10, -10, 810, 610);
         area.setVisible(false);
-        area.translateXProperty().bind(translateXProperty().multiply(-1));
-        area.translateYProperty().bind(translateYProperty().multiply(-1));
-        this.sceneProperty().addListener(i -> {
-            if (getScene() != null) {
-                area.widthProperty().bind(getScene().widthProperty().add(20));
-                area.heightProperty().bind(getScene().heightProperty().add(20));
-                if (abortedTileLoad) {
-                    abortedTileLoad = false;
-                    setCenter(lat, lon);
-                }
-            }
-        });
+        
+//        area.translateXProperty().bind(translateXProperty().multiply(-1));
+//        area.translateYProperty().bind(translateYProperty().multiply(-1));
+//        this.sceneProperty().addListener(i -> {
+//            if (getScene() != null) {
+//                area.widthProperty().bind(getScene().widthProperty().add(20));
+//                area.heightProperty().bind(getScene().heightProperty().add(20));
+//                if (abortedTileLoad) {
+//                    abortedTileLoad = false;
+//                    setCenter(lat, lon);
+//                }
+//            }
+//        });
         zoomProperty.addListener((ov, t, t1)
                 -> nearestZoom = (Math.min((int) floor(t1.doubleValue() + TIPPING), MAX_ZOOM - 1)));
         
         this.tileType.addListener((ObservableValue<? extends MapTileType> obs, MapTileType o, MapTileType n) -> {
-            System.out.println("TileType was changed.");
-            reloadTiles();
+            System.out.println("TileType was changed: " + n);
+            if (n != null) {
+                reloadTiles();
+            } else {
+                clearTiles();
+            }
         });
 
     }
@@ -401,6 +410,14 @@ public class MapArea extends Group implements BaseMap {
         
         System.out.println("TileType was changed, reloading tiles.");
         
+        clearTiles();
+        
+        loadTiles();
+        
+    }
+    
+    private void clearTiles() {
+        
         List<Node> toRemove = new ArrayList<>();
         ObservableList<Node> children = this.getChildren();
         for (Node child : children) {
@@ -414,8 +431,6 @@ public class MapArea extends Group implements BaseMap {
             tiles[i].clear();
         }
         
-        loadTiles();
-        
     }
 
     @Override
@@ -423,6 +438,35 @@ public class MapArea extends Group implements BaseMap {
         return this;
     }
     
+    public void install() {
+        
+        area.translateXProperty().bind(translateXProperty().multiply(-1));
+        area.translateYProperty().bind(translateYProperty().multiply(-1));
+        if (sceneListener == null) {
+            sceneListener = new InvalidationListener() {
+                @Override
+                public void invalidated(Observable observable) {
+                    area.widthProperty().bind(getScene().widthProperty().add(20));
+                    area.heightProperty().bind(getScene().heightProperty().add(20));
+                    if (abortedTileLoad) {
+                        abortedTileLoad = false;
+                        setCenter(lat, lon);
+                    }
+                }
+            };
+        }
+        this.sceneProperty().addListener(sceneListener);
+        
+    }
     
+    @Override
+    public void uninstall() {
+        this.sceneProperty().removeListener(sceneListener);
+        area.translateXProperty().unbind();
+        area.translateYProperty().unbind();
+        area.widthProperty().unbind();
+        area.heightProperty().unbind();
+        clearTiles();
+    }
     
 }
