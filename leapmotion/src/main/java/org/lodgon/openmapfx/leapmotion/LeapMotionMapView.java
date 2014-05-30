@@ -48,6 +48,8 @@ public class LeapMotionMapView extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        String lp = System.getProperty("java.library.path");
+        System.out.println("lp = "+lp);
         DefaultBaseMapProvider provider = new DefaultBaseMapProvider();
 
         LayeredMap map = new LayeredMap(provider);

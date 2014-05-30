@@ -127,7 +127,7 @@ public class MapView extends Application {
                 }
 
             };
-            MiataruService miataru = new MiataruService();
+            MiataruService miataru = new MiataruService("desktopdemo");
             services = FXCollections.observableArrayList();
             services.addAll(nothing, miataru);
         }
