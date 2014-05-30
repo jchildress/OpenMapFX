@@ -8,10 +8,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 import org.datafx.provider.ObjectDataProvider;
 import org.datafx.provider.ObjectDataProviderBuilder;
-import org.datafx.reader.RestSourceBuilder;
-import org.datafx.reader.converter.JsonConverter;
+import org.datafx.io.RestSourceBuilder;
+import org.datafx.io.converter.JsonConverter;
 
 /**
  *
@@ -20,9 +21,9 @@ import org.datafx.reader.converter.JsonConverter;
 public class Communicator {
 
 //    private static String SERVER = "http://192.168.1.6:8080/miataru/v1";
-    private static String SERVER = "http://service.miataru.com/v1";
+  //  private static String SERVER = "http://service.miataru.com/v1";
    // private static String SERVER = "http://localhost:8080/miataru/v1";
-  //  private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
+    private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
 //
 //    public static void retrieveLocation (Device device) {
 //        GetLocation gl = new GetLocation().device(device.getName());
@@ -67,9 +68,11 @@ public class Communicator {
             la[0] = l;
             UpdateLocation ul = new UpdateLocation().config(c).location(la);
             ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
+            JsonConverter converter = new JsonConverter(String.class);
             RestSourceBuilder rsb = RestSourceBuilder.create();
             rsb.host(SERVER + "/UpdateLocation")
                     .contentType("application/json")
+                    .converter(converter)
                     .dataString(ul.json());
             ObjectDataProviderBuilder odb = ObjectDataProviderBuilder.create();
             ObjectDataProvider provider = odb.dataReader(rsb.build()).resultProperty(resultProperty).build();
@@ -84,7 +87,9 @@ public class Communicator {
                             System.out.println("status of updateloc from " + t + " to " + t1);
                         System.out.println("[JVDBG] GETLOCATION result = "+resultProperty.get());
                                 System.out.println("[JVDBG]  WorkerLocationresult= "+worker.getValue());
-
+if (t1.equals(State.FAILED)) {
+    worker.getException().printStackTrace();
+}
                         }
                     }
                     );

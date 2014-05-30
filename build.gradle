@@ -2,6 +2,7 @@ allprojects {
     apply plugin: 'java'
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 }
 apply plugin: 'application'
@@ -45,12 +46,17 @@ project (':leapmotion') {
             compile project(":");
         }
     }
+    apply plugin: 'application'
+    run {
+        main = "org.lodgon.openmapfx.leapmotion.LeapMotionMapView"
+        jvmArgs = [ "-Djava.library.path=$LEAPSDK/lib/x64"]
+    }
 }
 
 project (':miataru') {
     dependencies {
             compile group:'org.codehaus.jackson', name:'jackson-mapper-asl', version:'1.9.9'
-            compile group:'org.javafxdata', name:'datafx-core', version:'2.0.2'
+            compile group:'org.javafxdata', name:'datasources', version:'8.0.5-SNAPSHOT'
             compile project(":");
     }
 }

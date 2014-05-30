@@ -44,6 +44,11 @@ public class MiataruService implements OpenMapFXService {
 
     private PositionService positionService;
     private ObjectProperty<Position> positionProperty;
+    private String device;
+    
+    public MiataruService (String device) {
+        this.device =  device;
+    }
     
     @Override
     public String getName() {
@@ -66,6 +71,10 @@ public class MiataruService implements OpenMapFXService {
 
             @Override
             public void invalidated(Observable observable) {
+                Position position = positionProperty.get();
+                double lat = position.getLatitude();
+                double lon = position.getLongitude();
+                Communicator.updateLocation(device, lat, lon);
                 System.out.println("new position: "+positionProperty.get());
             }
         });
