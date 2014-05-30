@@ -1,1 +1,1 @@
-A version of the original closer to its current state to allow contributing things back again.
+A collection of map-related JavaFX components, including LeapMotion and Android integration.
