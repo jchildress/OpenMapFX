@@ -42,12 +42,12 @@ import org.lodgon.openmapfx.core.TileProvider;
 public class MapView extends Application {
 
     LayeredMap map;
-    
+
     TileProvider[] tileProviders;
     SimpleProviderPicker spp;
-    
-	LicenceLayer licenceLayer;
-	
+
+    LicenceLayer licenceLayer;
+
     /**
      * @param args the command line arguments
      */
@@ -60,42 +60,40 @@ public class MapView extends Application {
         DefaultBaseMapProvider provider = new DefaultBaseMapProvider();
 
         spp = new SimpleProviderPicker(provider);
-        
+
         map = new LayeredMap(provider);
-        
+
         BorderPane cbp = new BorderPane();
         cbp.setCenter(map);
-        
+
         Rectangle clip = new Rectangle(700, 600);
         cbp.setClip(clip);
         clip.heightProperty().bind(cbp.heightProperty());
         clip.widthProperty().bind(cbp.widthProperty());
-        
+
         BorderPane bp = new BorderPane();
         bp.setTop(spp);
         bp.setCenter(cbp);
-        
+
         Scene scene = new Scene(bp, 800, 650);
         stage.setScene(scene);
         stage.show();
         map.setZoom(4);
         map.setCenter(50.2, 4.2);
         showMyLocation();
-		
-		licenceLayer = new LicenceLayer(provider);
+
+        licenceLayer = new LicenceLayer(provider);
         map.getLayers().add(licenceLayer);
     }
-    
-    
+
     private void showMyLocation() {
         URL im = this.getClass().getResource("../icons/mylocation.png");
         Image image = new Image(im.toString());
         PositionLayer positionLayer = new PositionLayer(image);
         map.getLayers().add(positionLayer);
         positionLayer.updatePosition(51.2, 4.2);
-        map.centerLatitudeProperty().addListener (i -> 
-        {
-            System.out.println("center of map: lat = "+map.centerLatitudeProperty().get()+", lon = "+map.centerLongitudeProperty().get());
+        map.centerLatitudeProperty().addListener(i -> {
+            System.out.println("center of map: lat = " + map.centerLatitudeProperty().get() + ", lon = " + map.centerLongitudeProperty().get());
         });
     }
 

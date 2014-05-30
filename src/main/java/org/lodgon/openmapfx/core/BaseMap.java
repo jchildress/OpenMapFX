@@ -104,4 +104,14 @@ public interface BaseMap {
      */
     public Node getView();
     
+    /** Called by the LayerMap to allow the BaseMap to install any needed 
+     * bindings and listeners.
+     */
+    public void install();
+    
+    /** Called by the LayerMap to allow the BaseMap to uninstall any 
+     * bindings and listeners.
+     */
+    public void uninstall();
+    
 }
