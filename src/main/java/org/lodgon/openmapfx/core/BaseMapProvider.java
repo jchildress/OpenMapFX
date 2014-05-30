@@ -29,7 +29,6 @@ package org.lodgon.openmapfx.core;
 import java.util.List;
 import javafx.beans.property.ObjectProperty;
 
-    
 /** 
  * A BaseMapProvider implementation can return a BaseMap implementation that 
  * can be plugged in as the bottom layer of the LayeredMap. It is distinct 
@@ -39,44 +38,44 @@ import javafx.beans.property.ObjectProperty;
  * @author Geoff Capper
  */
 public interface BaseMapProvider {
-    
+
     /** A descriptive name to be used in any UI elements.
      * 
      * @return 
      */
     public String getMapName();
-    
+
     /** The BaseMap implementation that will be shown in the LayeredMap.
      * 
      * @return 
      */
     public BaseMap getBaseMap();
-    
-	/** Supplies a potentially empty list of {@link TileProvider}s that can 
-	 * supply tiles for this map.
-	 * 
-	 * @return 
-	 */
-	public List<? extends TileProvider> getTileProviders();
-	
+
+    /** Supplies a potentially empty list of {@link TileProvider}s that can 
+     * supply tiles for this map.
+     * 
+     * @return 
+     */
+    public List<? extends TileProvider> getTileProviders();
+
     /**  Supported {@link MapTileType}s that can be shown by this type of map.
      * 
      * @return 
      */
     public List<? extends MapTileType> getTileTypes();
-    
+
     /** A property that can be bound to a UI control then used to switch the 
      * base map in the {@link LayeredMap}
      * 
      * @return 
      */
     public ObjectProperty<TileProvider> tileProviderProperty();
-    
+
     /** A property that can be bound to a UI control and then used to switch 
      * the tile type in the {@link LayeredMap}
      * 
      * @return 
      */
     public ObjectProperty<MapTileType> tileTypeProperty();
-	
+
 }
