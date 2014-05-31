@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root id="AnchorPane" prefHeight="379.0" prefWidth="306.0" style="-fx-background-color: null;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+    <VBox layoutX="14.0" layoutY="14.0" prefHeight="215.0" prefWidth="285.0" spacing="10.0">
+<children>
+        <Label layoutX="15.0" layoutY="2.0" text="CLIENT SETTINGS" /><HBox prefHeight="21.0" prefWidth="197.0">
+<children><Label text="Track and Report Location" /><Pane prefHeight="1.0" prefWidth="1.0" HBox.hgrow="ALWAYS" /><CheckBox fx:id="track" alignment="TOP_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" textAlignment="CENTER" />
+</children></HBox><HBox prefHeight="28.0" prefWidth="285.0">
+<children><Label text="Devicename" /><Pane prefHeight="19.0" prefWidth="14.0" HBox.hgrow="ALWAYS" /><TextField fx:id="deviceName" />
+</children></HBox><Button mnemonicParsing="false" onAction="#applyChanges" text="Apply" />
+</children>
+    </VBox>
+    </children>
+</fx:root>

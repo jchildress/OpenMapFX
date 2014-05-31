@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root id="AnchorPane" prefHeight="379.0" prefWidth="306.0" style="-fx-background-color: null;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+    <VBox layoutX="14.0" layoutY="14.0" prefHeight="215.0" prefWidth="285.0">
+      <children>
+        <HBox prefHeight="28.0" prefWidth="285.0">
+          <children>
+            <Label text="Known Devices" />
+          </children>
+        </HBox>
+        <HBox prefHeight="28.0" prefWidth="285.0">
+          <children>
+            <Label prefWidth="48.0" text="Name:" />
+            <TextField fx:id="newDeviceId" prefWidth="188.0" />
+            <Button mnemonicParsing="false" onAction="#addNewDevice" text="Add" />
+          </children>
+        </HBox>
+        <ListView fx:id="deviceList" prefHeight="200.0" prefWidth="200.0" />
+      </children>
+    </VBox>
+  </children>
+</fx:root>

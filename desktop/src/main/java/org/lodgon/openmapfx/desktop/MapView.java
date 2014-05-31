@@ -24,7 +24,6 @@
  */
 package org.lodgon.openmapfx.desktop;
 
-import java.util.LinkedList;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -32,15 +31,13 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 import org.lodgon.openmapfx.core.LayeredMap;
@@ -57,6 +54,7 @@ public class MapView extends Application {
     SimpleProviderPicker spp;
     HBox topMenu;
     private final BorderPane bp = new BorderPane();
+    private final Pane centerPane = new Pane();
     private ObservableList<OpenMapFXService> services;
     LicenceLayer licenceLayer;
 
@@ -77,9 +75,9 @@ public class MapView extends Application {
         HBox.setHgrow(white, Priority.ALWAYS);
         topMenu.getChildren().addAll(spp, white, createServiceMenu());
         map = new LayeredMap(provider);
-
+        centerPane.getChildren().add(map);
         BorderPane cbp = new BorderPane();
-        cbp.setCenter(map);
+        cbp.setCenter(centerPane);
 
         Rectangle clip = new Rectangle(700, 600);
         cbp.setClip(clip);
@@ -123,7 +121,7 @@ public class MapView extends Application {
                 }
 
                 @Override
-                public void activate() {
+                public void activate(Pane pane, LayeredMap layeredMap) {
                 }
 
             };
@@ -152,7 +150,7 @@ public class MapView extends Application {
         servicesMenu.valueProperty().addListener((ObservableValue<? extends OpenMapFXService> observable, OpenMapFXService oldValue, OpenMapFXService newService) -> {
             if (newService != null) {
                 Node menu = newService.getMenu();
-                newService.activate();
+                newService.activate(centerPane, map);
                 System.out.println("New service detected, menu = " + menu);
                 bp.setBottom(menu);
                 
