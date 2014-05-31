@@ -24,28 +24,28 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.lodgon.openmapfx.service;
-
-import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import org.lodgon.openmapfx.core.LayeredMap;
+package org.lodgon.openmapfx.service.miataru;
 
 /**
  *
  * @author johan
  */
-public interface OpenMapFXService {
+public class Device {
     
-    String getName();
-    
-    Node getMenu();
-    
+    private String name;
+
     /**
-     * Activate the service. This method will be called by OpenMapFX,
-     * and a pane and layeredmap are provided to the service
-     * @param centerPane  the "main" pane that the service can use. Initially.
-     * this will be occupied by the map itself.
-     * @param layeredMap  the inital layeredmap
+     * @return the name
      */
-    void activate(Pane centerPane, LayeredMap layeredMap);
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
 }

@@ -71,6 +71,15 @@ project (':desktop') {
         compile project(":");
         compile project(":miataru");
     }
+    compileJava {
+        doLast {
+println ('I will copy resources');
+            copy {
+                from '../miataru/src/main/resources'
+                into '../desktop/build/resources/main'
+            }
+        }
+    }
     apply plugin: 'application'
     mainClassName = "org.lodgon.openmapfx.desktop.MapView"
 }

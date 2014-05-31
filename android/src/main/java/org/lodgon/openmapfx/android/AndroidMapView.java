@@ -88,7 +88,7 @@ public class AndroidMapView extends Application {
         layeredMap = new LayeredMap(mapProvider);
         layeredMap.setZoom(14);
         System.out.println("Start miataru");
-        MiataruService miataru = new MiataruService();
+        MiataruService miataru = new MiataruService("my device");
         System.out.println("started miataru");
         if (real) {
             positionService = PositionService.getInstance();//new AndroidPositionService();

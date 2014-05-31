@@ -40,7 +40,8 @@ public class PositionLayer extends Parent implements MapLayer {
     
     private double lat;
     private double lon;
-    private final ImageView imageView;
+    // private ImageView imageView;
+    private Node icon;
     private double imageWidth, imageHeight;
     private LayeredMap layeredMap;
     
@@ -53,11 +54,21 @@ public class PositionLayer extends Parent implements MapLayer {
      * @param image the image that will be shown at the position of this layer
      */
     public PositionLayer (Image image) {
-        imageView = new ImageView(image);
+        icon = new ImageView(image);
         imageWidth = image.getWidth();
         imageHeight = image.getHeight();
-        imageView.setVisible(false);
-        getChildren().add(imageView);
+        icon.setVisible(false);
+        getChildren().add(icon);
+    }
+    
+    /**
+     * Create a PositionLayer with a specific Node that serves as the icon
+     * for the location. The node can be styled using css.
+     * @param node  the icon Node.
+     */
+    public PositionLayer (Node node) {
+        icon = node;
+        getChildren().add(node);
     }
     
     @Override
@@ -78,9 +89,9 @@ public class PositionLayer extends Parent implements MapLayer {
             System.out.println("[JVDBG] Null cartpoint, probably no scene, dont show.");
             return;
         }
-        imageView.setVisible(true);
-        imageView.setTranslateX(cartPoint.getX() - imageWidth/2);
-        imageView.setTranslateY(cartPoint.getY() - imageHeight/2);
+        icon.setVisible(true);
+        icon.setTranslateX(cartPoint.getX() - imageWidth/2);
+        icon.setTranslateY(cartPoint.getY() - imageHeight/2);
     }
 
     @Override

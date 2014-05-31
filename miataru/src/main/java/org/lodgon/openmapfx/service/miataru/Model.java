@@ -24,28 +24,34 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.lodgon.openmapfx.service;
+package org.lodgon.openmapfx.service.miataru;
 
-import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import org.lodgon.openmapfx.core.LayeredMap;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
  * @author johan
  */
-public interface OpenMapFXService {
+public class Model {
     
-    String getName();
+    private final static Model instance = new Model();
+    private final StringProperty deviceNameProperty = new SimpleStringProperty();
+    private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
     
-    Node getMenu();
+    private Model() {}
     
-    /**
-     * Activate the service. This method will be called by OpenMapFX,
-     * and a pane and layeredmap are provided to the service
-     * @param centerPane  the "main" pane that the service can use. Initially.
-     * this will be occupied by the map itself.
-     * @param layeredMap  the inital layeredmap
-     */
-    void activate(Pane centerPane, LayeredMap layeredMap);
+    public static Model getInstance() {
+        return instance;
+    }
+
+    public ObservableList<Device> trackingDevices() {
+        return trackingDevices;
+    }
+    
+    public StringProperty deviceNameProperty() {
+        return deviceNameProperty;
+    }
 }
