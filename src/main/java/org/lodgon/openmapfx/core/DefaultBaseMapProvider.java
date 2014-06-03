@@ -46,8 +46,8 @@ public class DefaultBaseMapProvider implements BaseMapProvider {
     
     private static final List<TileProvider> tileProviders = new LinkedList<>();
     static {
-        tileProviders.add(new MapQuestTileProvider());
         tileProviders.add(new OSMTileProvider());
+        tileProviders.add(new MapQuestTileProvider());
 	tileProviders.add(new StamenTileProvider());
     }
     
