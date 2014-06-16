@@ -25,17 +25,18 @@
 package org.lodgon.openmapfx.desktop;
 
 import javafx.application.Application;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -43,6 +44,7 @@ import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.LicenceLayer;
 import org.lodgon.openmapfx.core.TileProvider;
+import org.lodgon.openmapfx.service.MapViewPane;
 import org.lodgon.openmapfx.service.OpenMapFXService;
 import org.lodgon.openmapfx.service.miataru.MiataruService;
 
@@ -52,9 +54,9 @@ public class MapView extends Application {
 
     TileProvider[] tileProviders;
     SimpleProviderPicker spp;
-    HBox topMenu;
+    GridPane topMenu;
     private final BorderPane bp = new BorderPane();
-    private final Pane centerPane = new Pane();
+    private MapViewPane centerPane;
     private ObservableList<OpenMapFXService> services;
     LicenceLayer licenceLayer;
 
@@ -70,22 +72,30 @@ public class MapView extends Application {
         DefaultBaseMapProvider provider = new DefaultBaseMapProvider();
 
         spp = new SimpleProviderPicker(provider);
-        topMenu = new HBox();
-        Region white = new Region();
-        HBox.setHgrow(white, Priority.ALWAYS);
-        topMenu.getChildren().addAll(spp, white, createServiceMenu());
+
+        HBox servicesMenu = new HBox(4.0, new Label("Services: "), createServiceMenu());
+        servicesMenu.setStyle("-fx-padding:4px");
+        servicesMenu.setAlignment(Pos.CENTER_LEFT);
+
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setHgrow(Priority.ALWAYS);
+        ColumnConstraints column2 = new ColumnConstraints();
+
+        topMenu = new GridPane();
+        topMenu.getColumnConstraints().addAll(column1, column2);
+        topMenu.add(spp, 0, 0);
+        topMenu.add(servicesMenu, 1, 0);
+
         map = new LayeredMap(provider);
-        centerPane.getChildren().add(map);
-        BorderPane cbp = new BorderPane();
-        cbp.setCenter(centerPane);
+        centerPane = new MapViewPane(map);
 
         Rectangle clip = new Rectangle(700, 600);
-        cbp.setClip(clip);
-        clip.heightProperty().bind(cbp.heightProperty());
-        clip.widthProperty().bind(cbp.widthProperty());
+        centerPane.setClip(clip);
+        clip.heightProperty().bind(centerPane.heightProperty());
+        clip.widthProperty().bind(centerPane.widthProperty());
 
         bp.setTop(topMenu);
-        bp.setCenter(cbp);
+        bp.setCenter(centerPane);
 
         Scene scene = new Scene(bp, 800, 650);
         stage.setScene(scene);
@@ -121,7 +131,11 @@ public class MapView extends Application {
                 }
 
                 @Override
-                public void activate(Pane pane, LayeredMap layeredMap) {
+                public void activate(MapViewPane pane) {
+                }
+
+                @Override
+                public void deactivate() {
                 }
 
             };
@@ -147,16 +161,19 @@ public class MapView extends Application {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
-        servicesMenu.valueProperty().addListener((ObservableValue<? extends OpenMapFXService> observable, OpenMapFXService oldValue, OpenMapFXService newService) -> {
+
+        servicesMenu.valueProperty().addListener((observable, oldService, newService) -> {
+            if (oldService != null) {
+                oldService.deactivate();
+            }
+
             if (newService != null) {
                 Node menu = newService.getMenu();
-                newService.activate(centerPane, map);
+                newService.activate(centerPane);
                 System.out.println("New service detected, menu = " + menu);
                 bp.setBottom(menu);
-                
             }
         });
-        // servicesMenu.getSelectionModel().select(getServices().get(0));
         return servicesMenu;
     }
 

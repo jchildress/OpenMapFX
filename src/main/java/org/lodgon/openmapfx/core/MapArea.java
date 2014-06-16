@@ -446,8 +446,10 @@ public class MapArea extends Group implements BaseMap {
             sceneListener = new InvalidationListener() {
                 @Override
                 public void invalidated(Observable observable) {
-                    area.widthProperty().bind(getScene().widthProperty().add(20));
-                    area.heightProperty().bind(getScene().heightProperty().add(20));
+                    if (getScene() != null) {
+                        area.widthProperty().bind(getScene().widthProperty().add(20));
+                        area.heightProperty().bind(getScene().heightProperty().add(20));
+                    }
                     if (abortedTileLoad) {
                         abortedTileLoad = false;
                         setCenter(lat, lon);
