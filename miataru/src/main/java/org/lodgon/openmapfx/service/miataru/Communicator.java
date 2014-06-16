@@ -46,8 +46,8 @@ public class Communicator {
 
 //    private static String SERVER = "http://192.168.1.6:8080/miataru/v1";
   //  private static String SERVER = "http://service.miataru.com/v1";
-   // private static String SERVER = "http://localhost:8080/miataru/v1";
-    private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
+    private static String SERVER = "http://localhost:8080/miataru/v1";
+//    private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
 //
 //    public static void retrieveLocation (Device device) {
 //        GetLocation gl = new GetLocation().device(device.getName());

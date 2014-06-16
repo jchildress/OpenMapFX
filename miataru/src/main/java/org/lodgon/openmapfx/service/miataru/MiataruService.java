@@ -27,25 +27,20 @@
 package org.lodgon.openmapfx.service.miataru;
 
 import java.net.URL;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
+import org.lodgon.openmapfx.service.MapViewPane;
 import org.lodgon.openmapfx.service.OpenMapFXService;
 
 /**
@@ -56,12 +51,11 @@ public class MiataruService implements OpenMapFXService {
 
     private PositionService positionService;
     private ObjectProperty<Position> positionProperty;
-    private String device;
+    private final String device;
     private final PositionLayer positionLayer;
     final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
     private final DevicesPane devicesPane;
-    private Pane centerPane;
-    private LayeredMap layeredMap;
+    private MapViewPane pane;
     
     public MiataruService (String device) {
         this.device =  device;
@@ -88,28 +82,13 @@ public class MiataruService implements OpenMapFXService {
         ImageView devicesView= new ImageView(devicesUrl.toString());
         Label devicesLabel = new Label ("devices");
         VBox devicesBox = new VBox(devicesView, devicesLabel);
-        devicesBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent t) {
-                System.out.println("Clicked on devicesBox");
-             //   AndroidMapper.this.appPane.setCenter(devicesPane);
-                // for some reason, the bottomMenus is below the appPane. Need to refactor this
-             //   bottomMenu.toFront();
-            }
-        });
+        devicesBox.setOnMouseClicked(e -> System.out.println("Clicked on devicesBox"));
         System.out.println("[JVDBG] DBHandler = "+devicesBox.getOnMouseClicked());
         URL mapUrl = this.getClass().getResource(RESOURCES + "/icons/map.png");
         ImageView mapView= new ImageView(mapUrl.toString());
         Label mapLabel = new Label ("map");
         VBox mapBox = new VBox (mapView, mapLabel);
-        mapBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-              //  AndroidMapper.this.appPane.setCenter(mapPane);
-             //   bottomMenu.toFront();
-            }
-        });
+        mapBox.setOnMouseClicked(e -> pane.showMap());
         URL historyUrl = this.getClass().getResource(RESOURCES + "/icons/history.png");
         ImageView historyView= new ImageView(historyUrl.toString());
         Label historyLabel = new Label ("history");
@@ -118,16 +97,7 @@ public class MiataruService implements OpenMapFXService {
         ImageView settingsView= new ImageView(settingsUrl.toString());
         Label settingsLabel = new Label("settings");
         VBox settingsBox = new VBox (settingsView, settingsLabel);
-        settingsBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent t) {
-                centerPane.getChildren().clear();
-                centerPane.getChildren().add(devicesPane);
-             //   AndroidMapper.this.appPane.setCenter(settingsPane);
-           //     bottomMenu.toFront();
-            }
-        });
+        settingsBox.setOnMouseClicked(e -> pane.setActiveNode(devicesPane));
         hbox.getChildren().addAll(devicesBox, w1, mapBox, w2, historyBox,
                 w3, settingsBox);
         hbox.setPrefWidth(500);
@@ -137,27 +107,30 @@ public class MiataruService implements OpenMapFXService {
         return hbox;
 
     }
-    
-    @Override
-    public void activate(Pane centerPane, LayeredMap layeredMap) {
-        this.centerPane = centerPane;
-        this.layeredMap = layeredMap;
-        System.out.println("Activate miataruService");
-        layeredMap.getLayers().add(positionLayer);
-        positionService = PositionService.getInstance();
-        positionProperty = positionService.positionProperty();
-        positionProperty.addListener(new InvalidationListener() {
 
-            @Override
-            public void invalidated(Observable observable) {
+    @Override
+    public void activate(MapViewPane pane) {
+        this.pane = pane;
+        System.out.println("Activate miataruService");
+        pane.getMap().getLayers().add(positionLayer);
+        if (positionService == null) {
+            positionService = PositionService.getInstance();
+            positionProperty = positionService.positionProperty();
+            positionProperty.addListener(observable -> {
                 Position position = positionProperty.get();
                 double lat = position.getLatitude();
                 double lon = position.getLongitude();
                 positionLayer.updatePosition(lat, lon);
                 Communicator.updateLocation(device, lat, lon);
                 System.out.println("new position: "+positionProperty.get());
-            }
-        });
+            });
+        }
     }
-    
+
+    @Override
+    public void deactivate() {
+        this.pane.getMap().getLayers().remove(positionLayer);
+        this.pane.showMap();
+    }
+
 }
