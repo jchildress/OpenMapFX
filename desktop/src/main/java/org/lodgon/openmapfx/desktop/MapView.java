@@ -168,10 +168,8 @@ public class MapView extends Application {
             }
 
             if (newService != null) {
-                Node menu = newService.getMenu();
                 newService.activate(centerPane);
-                System.out.println("New service detected, menu = " + menu);
-                bp.setBottom(menu);
+                bp.setBottom(newService.getMenu());
             }
         });
         return servicesMenu;

@@ -36,7 +36,6 @@ import javafx.concurrent.Worker.State;
 import org.datafx.provider.ObjectDataProvider;
 import org.datafx.provider.ObjectDataProviderBuilder;
 import org.datafx.reader.RestSourceBuilder;
-import org.datafx.reader.converter.JsonConverter;
 
 /**
  *
