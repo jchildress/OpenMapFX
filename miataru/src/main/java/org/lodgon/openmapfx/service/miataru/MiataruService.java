@@ -28,12 +28,12 @@ package org.lodgon.openmapfx.service.miataru;
 
 import java.net.URL;
 import javafx.beans.property.ObjectProperty;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -54,14 +54,19 @@ public class MiataruService implements OpenMapFXService {
     private final String device;
     private final PositionLayer positionLayer;
     final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
+
     private final DevicesPane devicesPane;
+    private final SettingsPane settingsPane;
+
     private MapViewPane pane;
     
     public MiataruService (String device) {
         this.device =  device;
         Circle icon = new Circle(5, Color.GREEN);
         positionLayer = new PositionLayer(icon);
+
         this.devicesPane = new DevicesPane();
+        this.settingsPane = new SettingsPane();
     }
     
     @Override
@@ -71,41 +76,47 @@ public class MiataruService implements OpenMapFXService {
 
     @Override
     public Node getMenu() {
-        Region w1 = new Region();
-        w1.setPrefWidth(10);
-        Region w2 = new Region();
-        w2.setPrefWidth(10);
-        Region w3 = new Region();
-        w3.setPrefWidth(10);
-        HBox hbox = new HBox();
         URL devicesUrl = this.getClass().getResource(RESOURCES + "/icons/devices.png");
-        ImageView devicesView= new ImageView(devicesUrl.toString());
+        ImageView devicesView = new ImageView(devicesUrl.toString());
         Label devicesLabel = new Label ("devices");
         VBox devicesBox = new VBox(devicesView, devicesLabel);
-        devicesBox.setOnMouseClicked(e -> System.out.println("Clicked on devicesBox"));
-        System.out.println("[JVDBG] DBHandler = "+devicesBox.getOnMouseClicked());
+        devicesBox.setAlignment(Pos.TOP_CENTER);
+        devicesBox.setOnMouseClicked(e -> pane.setActiveNode(devicesPane));
+
         URL mapUrl = this.getClass().getResource(RESOURCES + "/icons/map.png");
         ImageView mapView= new ImageView(mapUrl.toString());
         Label mapLabel = new Label ("map");
-        VBox mapBox = new VBox (mapView, mapLabel);
+        VBox mapBox = new VBox(mapView, mapLabel);
+        mapBox.setAlignment(Pos.TOP_CENTER);
         mapBox.setOnMouseClicked(e -> pane.showMap());
+
         URL historyUrl = this.getClass().getResource(RESOURCES + "/icons/history.png");
         ImageView historyView= new ImageView(historyUrl.toString());
         Label historyLabel = new Label ("history");
         VBox historyBox = new VBox(historyView, historyLabel);
+        historyBox.setAlignment(Pos.TOP_CENTER);
+
         URL settingsUrl = this.getClass().getResource(RESOURCES + "/icons/settings.png");
         ImageView settingsView= new ImageView(settingsUrl.toString());
         Label settingsLabel = new Label("settings");
         VBox settingsBox = new VBox (settingsView, settingsLabel);
-        settingsBox.setOnMouseClicked(e -> pane.setActiveNode(devicesPane));
-        hbox.getChildren().addAll(devicesBox, w1, mapBox, w2, historyBox,
-                w3, settingsBox);
-        hbox.setPrefWidth(500);
-        HBox.setHgrow(w1, Priority.ALWAYS);
-        HBox.setHgrow(w2, Priority.ALWAYS);
-        HBox.setHgrow(w3, Priority.ALWAYS);
-        return hbox;
+        settingsBox.setAlignment(Pos.TOP_CENTER);
+        settingsBox.setOnMouseClicked(e -> pane.setActiveNode(settingsPane));
 
+        GridPane menu = new GridPane();
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(25.0);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(25.0);
+        ColumnConstraints column3 = new ColumnConstraints();
+        column3.setPercentWidth(25.0);
+        ColumnConstraints column4 = new ColumnConstraints();
+        column4.setPercentWidth(25.0);
+        menu.getColumnConstraints().addAll(column1, column2, column3, column4);
+
+        menu.addRow(0, devicesBox, mapBox, historyBox, settingsBox);
+
+        return menu;
     }
 
     @Override

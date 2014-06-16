@@ -10,7 +10,7 @@
       <children>
         <HBox prefHeight="28.0" prefWidth="285.0">
           <children>
-            <Label text="Known Devices" />
+            <Label text="KNOWN DEVICES" />
           </children>
         </HBox>
         <HBox prefHeight="28.0" prefWidth="285.0">
