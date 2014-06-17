@@ -27,6 +27,10 @@
 package org.lodgon.openmapfx.service.miataru;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -37,6 +41,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
@@ -47,26 +52,37 @@ import org.lodgon.openmapfx.service.OpenMapFXService;
  *
  * @author johan
  */
-public class MiataruService implements OpenMapFXService {
+public class MiataruService implements OpenMapFXService, LocationListener  {
 
     private PositionService positionService;
     private ObjectProperty<Position> positionProperty;
-    private final String device;
-    private final PositionLayer positionLayer;
+
+    private final Map<String, PositionLayer> positionLayers = new HashMap<>();
+    private final PositionLayer personalPositionLayer;
+    private Timeline getLocationsTimeline;
+
     final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
+
+    private final Model model = Model.getInstance();
+    private final Communicator communicator = new Communicator(model);
 
     private final DevicesPane devicesPane;
     private final SettingsPane settingsPane;
 
     private MapViewPane pane;
     
-    public MiataruService (String device) {
-        this.device =  device;
+    public MiataruService() {
         Circle icon = new Circle(5, Color.GREEN);
-        positionLayer = new PositionLayer(icon);
+        personalPositionLayer = new PositionLayer(icon);
 
-        this.devicesPane = new DevicesPane();
+        this.devicesPane = new DevicesPane(communicator);
         this.settingsPane = new SettingsPane();
+
+        communicator.addLocationListener(this);
+        getLocationsTimeline = new Timeline(new KeyFrame(Duration.seconds(15.0), e -> {
+            communicator.retrieveLocation(model.trackingDevices());
+        }));
+        getLocationsTimeline.setCycleCount(Timeline.INDEFINITE);
     }
     
     @Override
@@ -123,7 +139,7 @@ public class MiataruService implements OpenMapFXService {
     public void activate(MapViewPane pane) {
         this.pane = pane;
         System.out.println("Activate miataruService");
-        pane.getMap().getLayers().add(positionLayer);
+        pane.getMap().getLayers().add(personalPositionLayer);
         if (positionService == null) {
             positionService = PositionService.getInstance();
             positionProperty = positionService.positionProperty();
@@ -131,17 +147,36 @@ public class MiataruService implements OpenMapFXService {
                 Position position = positionProperty.get();
                 double lat = position.getLatitude();
                 double lon = position.getLongitude();
-                positionLayer.updatePosition(lat, lon);
-                Communicator.updateLocation(device, lat, lon);
-                System.out.println("new position: "+positionProperty.get());
+                personalPositionLayer.updatePosition(lat, lon);
+                if (model.trackProperty().get()) {
+                    communicator.updateLocation(lat, lon);
+                    System.out.println("new position: "+positionProperty.get());
+                }
             });
         }
+
+        communicator.addLocationListener(this);
+        getLocationsTimeline.play();
     }
 
     @Override
     public void deactivate() {
-        this.pane.getMap().getLayers().remove(positionLayer);
+        this.pane.getMap().getLayers().remove(personalPositionLayer);
         this.pane.showMap();
+        this.getLocationsTimeline.stop();
+    }
+
+    @Override
+    public void newLocation(Location location) {
+        PositionLayer positionLayer = positionLayers.get(location.getDevice());
+        if (positionLayer == null) {
+            Circle icon = new Circle(5, Color.RED);
+            positionLayer = new PositionLayer(icon);
+            positionLayers.put(location.getDevice(), positionLayer);
+            pane.getMap().getLayers().add(positionLayer);
+        }
+
+        positionLayer.updatePosition(location.getLatitude(), location.getLongitude());
     }
 
 }
