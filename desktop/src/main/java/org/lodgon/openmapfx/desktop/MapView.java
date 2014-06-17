@@ -139,7 +139,7 @@ public class MapView extends Application {
                 }
 
             };
-            MiataruService miataru = new MiataruService("desktopdemo");
+            MiataruService miataru = new MiataruService();
             services = FXCollections.observableArrayList();
             services.addAll(nothing, miataru);
         }

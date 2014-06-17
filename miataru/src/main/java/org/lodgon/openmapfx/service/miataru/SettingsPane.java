@@ -5,17 +5,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 
 /**
  *
  * @author johan
  */
-public class SettingsPane extends AnchorPane {
+public class SettingsPane extends GridPane {
 
     private final Model model = Model.getInstance();
 
     @FXML CheckBox track;
+    @FXML CheckBox history;
     @FXML TextField deviceName;
 
     public SettingsPane() {
@@ -32,12 +33,14 @@ public class SettingsPane extends AnchorPane {
     @FXML
     public void initialize() {
         track.setSelected(model.trackProperty().get());
+        history.setSelected(model.historyEnabledProperty().get());
         deviceName.setText(model.deviceNameProperty().get());
     }
 
     @FXML
     public void applyChanges() {
         model.trackProperty().set(track.isSelected());
+        model.historyEnabledProperty().set(history.isSelected());
         model.deviceNameProperty().set(deviceName.getText());
     }
 

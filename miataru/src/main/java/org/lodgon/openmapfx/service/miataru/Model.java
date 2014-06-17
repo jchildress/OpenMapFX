@@ -27,7 +27,9 @@
 package org.lodgon.openmapfx.service.miataru;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -41,10 +43,11 @@ public class Model {
     
     private final static Model instance = new Model();
 
-    private final BooleanProperty trackProperty = new SimpleBooleanProperty();
+    private final BooleanProperty trackProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty historyEnabledProperty = new SimpleBooleanProperty(false);
     private final StringProperty deviceNameProperty = new SimpleStringProperty();
     private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
-    
+
     private Model() {}
     
     public static Model getInstance() {
@@ -61,6 +64,10 @@ public class Model {
 
     public BooleanProperty trackProperty() {
         return trackProperty;
+    }
+
+    public BooleanProperty historyEnabledProperty() {
+        return historyEnabledProperty;
     }
 
 }

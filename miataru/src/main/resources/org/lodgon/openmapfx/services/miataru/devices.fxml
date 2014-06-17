@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root id="AnchorPane" prefHeight="379.0" prefWidth="306.0" style="-fx-background-color: null;" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-  <children>
-    <VBox layoutX="14.0" layoutY="14.0" prefHeight="215.0" prefWidth="285.0">
-      <children>
-        <HBox prefHeight="28.0" prefWidth="285.0">
-          <children>
-            <Label text="KNOWN DEVICES" />
-          </children>
-        </HBox>
-        <HBox prefHeight="28.0" prefWidth="285.0">
-          <children>
-            <Label prefWidth="48.0" text="Name:" />
-            <TextField fx:id="newDeviceId" prefWidth="188.0" />
-            <Button mnemonicParsing="false" onAction="#addNewDevice" text="Add" />
-          </children>
-        </HBox>
-        <ListView fx:id="deviceList" prefHeight="200.0" prefWidth="200.0" />
-      </children>
-    </VBox>
-  </children>
+
+<fx:root prefHeight="215.0" prefWidth="285.0" spacing="4.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<children>
+<Label text="KNOWN DEVICES" />
+  <ListView fx:id="deviceList" prefHeight="200.0" prefWidth="200.0" />
+      <Label text="Add a device:" />
+  <HBox prefHeight="28.0" prefWidth="285.0">
+    <children>
+      <TextField fx:id="newDeviceId" prefWidth="188.0" HBox.hgrow="ALWAYS" />
+      <Button mnemonicParsing="false" onAction="#addNewDevice" text="add" />
+    </children>
+  </HBox>
+</children>
+   <padding>
+      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+   </padding>
 </fx:root>
