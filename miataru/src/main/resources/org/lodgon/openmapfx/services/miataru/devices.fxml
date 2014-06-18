@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <fx:root prefHeight="215.0" prefWidth="285.0" spacing="4.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 <children>
-<Label text="KNOWN DEVICES" />
-  <ListView fx:id="deviceList" prefHeight="200.0" prefWidth="200.0" />
+<Label text="KNOWN DEVICES">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></Label>
+  <ListView fx:id="deviceList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
       <Label text="Add a device:" />
   <HBox prefHeight="28.0" prefWidth="285.0">
     <children>

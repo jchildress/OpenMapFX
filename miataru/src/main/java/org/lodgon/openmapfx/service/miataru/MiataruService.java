@@ -44,6 +44,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import org.lodgon.openmapfx.core.MultiPositionLayer;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
@@ -59,13 +60,14 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
     private PositionService positionService;
     private ObjectProperty<Position> positionProperty;
 
-    private final Map<String, PositionLayer> positionLayers = new HashMap<>();
+    private final Map<String, Node> deviceNodes = new HashMap<>();
+    private final MultiPositionLayer knownDevicesPositionLayer = new MultiPositionLayer();
     private final PositionLayer personalPositionLayer;
     private Timeline getLocationsTimeline;
 
     final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
 
-    private final Model model = Model.getInstance();
+    private final Model model = new Model();
     private final Communicator communicator = new Communicator(model);
 
     private final DevicesPane devicesPane;
@@ -77,8 +79,8 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         Circle icon = new Circle(5, Color.GREEN);
         personalPositionLayer = new PositionLayer(icon);
 
-        this.devicesPane = new DevicesPane(communicator);
-        this.settingsPane = new SettingsPane();
+        this.devicesPane = new DevicesPane(model);
+        this.settingsPane = new SettingsPane(model);
 
         communicator.addLocationListener(this);
 
@@ -157,7 +159,7 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
     public void activate(MapViewPane pane) {
         this.pane = pane;
         System.out.println("Activate miataruService");
-        pane.getMap().getLayers().add(personalPositionLayer);
+        pane.getMap().getLayers().addAll(personalPositionLayer, knownDevicesPositionLayer);
         if (positionService == null) {
             positionService = PositionService.getInstance();
             positionProperty = positionService.positionProperty();
@@ -173,28 +175,26 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
             });
         }
 
-        communicator.addLocationListener(this);
         getLocationsTimeline.play();
     }
 
     @Override
     public void deactivate() {
-        this.pane.getMap().getLayers().remove(personalPositionLayer);
+        this.pane.getMap().getLayers().removeAll(personalPositionLayer, knownDevicesPositionLayer);
         this.pane.showMap();
         this.getLocationsTimeline.stop();
     }
 
     @Override
     public void newLocation(Location location) {
-        PositionLayer positionLayer = positionLayers.get(location.getDevice());
-        if (positionLayer == null) {
-            Circle icon = new Circle(5, Color.RED);
-            positionLayer = new PositionLayer(icon);
-            positionLayers.put(location.getDevice(), positionLayer);
-            pane.getMap().getLayers().add(positionLayer);
+        Node deviceNode = deviceNodes.get(location.getDevice());
+        if (deviceNode == null) {
+            deviceNode = new Circle(5, Color.RED);
+            deviceNodes.put(location.getDevice(), deviceNode);
+            knownDevicesPositionLayer.addNode(deviceNode, location.getLatitude(), location.getLongitude());
+        } else {
+            knownDevicesPositionLayer.updatePosition(deviceNode, location.getLatitude(), location.getLongitude());
         }
-
-        positionLayer.updatePosition(location.getLatitude(), location.getLongitude());
     }
 
 }
