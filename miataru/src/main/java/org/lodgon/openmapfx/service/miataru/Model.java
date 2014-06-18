@@ -25,9 +25,9 @@
 package org.lodgon.openmapfx.service.miataru;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -49,6 +49,7 @@ public class Model {
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://lodgon.dyndns.org:9999/miataru/v1");
     private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
     private final StringProperty updateIntervalProperty = new SimpleStringProperty("30s");
+    private final ObjectProperty<Device> showingHistoryForDeviceProperty = new SimpleObjectProperty<>();
 
     public ObservableList<Device> trackingDevices() {
         return trackingDevices;
@@ -79,7 +80,7 @@ public class Model {
     }
 
     public String getServerServiceLocation() {
-        String serverServiceLocation = "";
+        String serverServiceLocation;
 
         String serverLocation = getServerLocation();
         if (serverLocation.startsWith("http")) {
@@ -112,6 +113,14 @@ public class Model {
 
     public boolean isHistoryEnabled() {
         return historyEnabledProperty.get();
+    }
+
+    public ObjectProperty<Device> showingHistoryForDeviceProperty() {
+        return showingHistoryForDeviceProperty;
+    }
+
+    public Device getShowingHistoryForDevice() {
+        return showingHistoryForDeviceProperty.get();
     }
 
     public StringProperty updateIntervalProperty() {

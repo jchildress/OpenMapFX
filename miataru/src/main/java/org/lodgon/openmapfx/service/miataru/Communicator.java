@@ -73,7 +73,7 @@ public class Communicator {
             Platform.runLater(() -> {
                 Worker worker = provider.retrieve();
                 worker.stateProperty().addListener((ov, oldState, newState) -> {
-                    System.out.println("status of updateloc from " + oldState + " to " + newState);
+                    System.out.println("status of retrieveLocation from " + oldState + " to " + newState);
                     System.out.println("[JVDBG] GETLOCATION response = " + resultProperty.get());
                     if (newState.equals(Worker.State.SUCCEEDED)) {
                         GetLocationResponse getLocationResponse = new GetLocationResponse();
@@ -89,6 +89,35 @@ public class Communicator {
                 });
             });
         }
+    }
+
+    public void retrieveHistory(Device device) {
+        GetLocationHistory glh = new GetLocationHistory();
+        glh.device(device).amount(25);
+
+        ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
+        RestSourceBuilder rsb = RestSourceBuilder.create();
+        rsb.host(model.getServerServiceLocation() + "GetLocationHistory")
+                .contentType("application/json")
+                .converter(new PlainTextConverter())
+                .dataString(glh.json());
+        ObjectDataProviderBuilder odb = ObjectDataProviderBuilder.create();
+        ObjectDataProvider provider = odb.dataReader(rsb.build()).resultProperty(resultProperty).build();
+
+        Platform.runLater(() -> {
+            Worker worker = provider.retrieve();
+            worker.stateProperty().addListener((ov, oldState, newState) -> {
+                System.out.println("status of retrieveHistory from " + oldState + " to " + newState);
+                System.out.println("[JVDBG] GETLOCATIONHISTORY response = " + resultProperty.get());
+                if (newState.equals(Worker.State.SUCCEEDED)) {
+                    GetLocationHistoryResponse getLocationHistoryResponse = new GetLocationHistoryResponse();
+                    getLocationHistoryResponse.fromJson(resultProperty.get());
+                    for (LocationListener locationListener : locationListeners) {
+                        locationListener.newHistory(device, getLocationHistoryResponse.getLocations());
+                    }
+                }
+            });
+        });
     }
 
     public void updateLocation(double lat, double lon) {
@@ -116,7 +145,7 @@ public class Communicator {
             Platform.runLater(() -> {
                 Worker worker = provider.retrieve();
                 worker.stateProperty().addListener((ov, oldState, newState) -> {
-                    System.out.println("status of updateloc from " + oldState + " to " + newState);
+                    System.out.println("status of updateLocation from " + oldState + " to " + newState);
                     System.out.println("[JVDBG] UPDATELOCATION response = " + resultProperty.get());
                     if (newState.equals(State.FAILED)) {
                         worker.getException().printStackTrace();

@@ -6,6 +6,8 @@
 
 package org.lodgon.openmapfx.service.miataru;
 
+import java.util.List;
+
 /**
  *
  * @author joeri
@@ -13,5 +15,7 @@ package org.lodgon.openmapfx.service.miataru;
 public interface LocationListener {
 
     void newLocation(Location location);
+
+    void newHistory(Device device, List<Location> locations);
 
 }
