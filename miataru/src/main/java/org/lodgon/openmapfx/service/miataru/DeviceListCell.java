@@ -21,12 +21,11 @@ import static org.lodgon.openmapfx.service.miataru.MiataruService.RESOURCES;
 public class DeviceListCell extends ListCell<Device> {
 
     private final Image removeImage = new Image(this.getClass().getResourceAsStream(RESOURCES + "/icons/remove.png"));
-    private final Model model = Model.getInstance();
 
     private final Label label;
     private final HBox graphic;
 
-    public DeviceListCell() {
+    public DeviceListCell(Model model) {
         ImageView removeImageView = new ImageView(removeImage);
         removeImageView.setFitHeight(12.0);
         removeImageView.setFitWidth(12.0);

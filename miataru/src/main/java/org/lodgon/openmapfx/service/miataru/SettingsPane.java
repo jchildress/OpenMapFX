@@ -14,7 +14,7 @@ import javafx.scene.layout.GridPane;
  */
 public class SettingsPane extends GridPane {
 
-    private final Model model = Model.getInstance();
+    private final Model model;
 
     @FXML CheckBox track;
     @FXML CheckBox history;
@@ -23,7 +23,9 @@ public class SettingsPane extends GridPane {
     @FXML TextField serverLocation;
     @FXML ComboBox<String> updateInterval;
 
-    public SettingsPane() {
+    public SettingsPane(Model model) {
+        this.model = model;
+
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(MiataruService.RESOURCES+"/settings.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

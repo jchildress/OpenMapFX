@@ -13,14 +13,13 @@ import javafx.scene.layout.VBox;
  */
 public class DevicesPane extends VBox {
 
-    private final Model model = Model.getInstance();
-    private final Communicator communicator;
+    private final Model model;
 
     @FXML ListView<Device> deviceList;
     @FXML TextField newDeviceId;
 
-    public DevicesPane(Communicator communicator) {
-        this.communicator = communicator;
+    public DevicesPane(Model model) {
+        this.model = model;
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(MiataruService.RESOURCES+"/devices.fxml"));
         fxmlLoader.setRoot(this);
@@ -35,7 +34,7 @@ public class DevicesPane extends VBox {
     @FXML
     public void initialize() {
         deviceList.setItems(model.trackingDevices());
-        deviceList.setCellFactory(lv -> new DeviceListCell());
+        deviceList.setCellFactory(lv -> new DeviceListCell(model));
     }
 
     @FXML

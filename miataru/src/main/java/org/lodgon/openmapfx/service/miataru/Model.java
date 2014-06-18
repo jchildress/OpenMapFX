@@ -39,8 +39,6 @@ import javafx.collections.ObservableList;
  */
 public class Model {
 
-    private final static Model instance = new Model();
-
     private final BooleanProperty trackingProperty = new SimpleBooleanProperty(true);
     private final BooleanProperty historyEnabledProperty = new SimpleBooleanProperty(false);
     private final StringProperty deviceNameProperty = new SimpleStringProperty("Demo Device");
@@ -51,13 +49,6 @@ public class Model {
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://lodgon.dyndns.org:9999/miataru/v1");
     private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
     private final StringProperty updateIntervalProperty = new SimpleStringProperty("30s");
-
-    private Model() {
-    }
-
-    public static Model getInstance() {
-        return instance;
-    }
 
     public ObservableList<Device> trackingDevices() {
         return trackingDevices;
