@@ -26,8 +26,6 @@ package org.lodgon.openmapfx.service.miataru;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -45,12 +43,6 @@ import org.datafx.reader.RestSourceBuilder;
  */
 public class Communicator {
 
-//    private static final String SERVER = "http://192.168.1.6:8080/miataru/v1";
-    private static final String SERVER = "http://service.miataru.com/v1";
-//    private static final String SERVER = "http://localhost:8080/miataru/v1";
-//    private static final String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
-
-    private final ExecutorService pool = Executors.newFixedThreadPool(10);
     private final List<LocationListener> locationListeners = new ArrayList<>();
 
     private final Model model;
@@ -71,7 +63,7 @@ public class Communicator {
             }
             ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
             RestSourceBuilder rsb = RestSourceBuilder.create();
-            rsb.host(SERVER + "/GetLocation")
+            rsb.host(model.getServerServiceLocation() + "GetLocation")
                     .contentType("application/json")
                     .converter(new PlainTextConverter())
                     .dataString(gl.json());
@@ -100,13 +92,13 @@ public class Communicator {
     }
 
     public void updateLocation(double lat, double lon) {
-        String deviceName = model.deviceNameProperty().get();
+        String deviceName = model.getDeviceName();
         if (deviceName == null || deviceName.trim().isEmpty()) {
             deviceName = "Demo Device";
         }
-        System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat + ", server = " + SERVER);
+        System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat + ", server = " + model.getServerServiceLocation());
         try {
-            String enableLocationHistory = model.historyEnabledProperty().get() ? "True" : "False";
+            String enableLocationHistory = model.isHistoryEnabled() ? "True" : "False";
             Config c = new Config().enableLocationHistory(enableLocationHistory).locationDataRetentionTime("15");
             Location l = new Location().device(deviceName).timestamp(Long.toString(System.currentTimeMillis() / 1000))
                     .longitude(Double.toString(lon)).latitude(Double.toString(lat)).horizontalAccuracy("40.00");
@@ -115,7 +107,7 @@ public class Communicator {
             UpdateLocation ul = new UpdateLocation().config(c).location(la);
             ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
             RestSourceBuilder rsb = RestSourceBuilder.create();
-            rsb.host(SERVER + "/UpdateLocation")
+            rsb.host(model.getServerServiceLocation() + "UpdateLocation")
                     .contentType("application/json")
                     .converter(new PlainTextConverter())
                     .dataString(ul.json());

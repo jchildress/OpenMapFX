@@ -148,7 +148,7 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
                 double lat = position.getLatitude();
                 double lon = position.getLongitude();
                 personalPositionLayer.updatePosition(lat, lon);
-                if (model.trackProperty().get()) {
+                if (model.trackingProperty().get()) {
                     communicator.updateLocation(lat, lon);
                     System.out.println("new position: "+positionProperty.get());
                 }

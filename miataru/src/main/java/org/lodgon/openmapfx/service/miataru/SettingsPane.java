@@ -18,6 +18,7 @@ public class SettingsPane extends GridPane {
     @FXML CheckBox track;
     @FXML CheckBox history;
     @FXML TextField deviceName;
+    @FXML TextField serverLocation;
 
     public SettingsPane() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(MiataruService.RESOURCES+"/settings.fxml"));
@@ -32,16 +33,10 @@ public class SettingsPane extends GridPane {
 
     @FXML
     public void initialize() {
-        track.setSelected(model.trackProperty().get());
-        history.setSelected(model.historyEnabledProperty().get());
-        deviceName.setText(model.deviceNameProperty().get());
-    }
-
-    @FXML
-    public void applyChanges() {
-        model.trackProperty().set(track.isSelected());
-        model.historyEnabledProperty().set(history.isSelected());
-        model.deviceNameProperty().set(deviceName.getText());
+        track.selectedProperty().bindBidirectional(model.trackingProperty());
+        history.selectedProperty().bindBidirectional(model.historyEnabledProperty());
+        deviceName.textProperty().bindBidirectional(model.deviceNameProperty());
+        serverLocation.textProperty().bindBidirectional(model.serverLocationProperty());
     }
 
 }
