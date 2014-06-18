@@ -28,6 +28,7 @@ package org.lodgon.openmapfx.service.miataru;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -61,11 +62,14 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
     private ObjectProperty<Position> positionProperty;
 
     private final Map<String, Node> deviceNodes = new HashMap<>();
+    private final MultiPositionLayer historyPositionLayer = new MultiPositionLayer();
     private final MultiPositionLayer knownDevicesPositionLayer = new MultiPositionLayer();
     private final PositionLayer personalPositionLayer;
     private Timeline getLocationsTimeline;
 
     final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
+
+    private final Device device;
 
     private final Model model = new Model();
     private final Communicator communicator = new Communicator(model);
@@ -76,6 +80,9 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
     private MapViewPane pane;
     
     public MiataruService() {
+        this.device = new Device();
+        this.device.nameProperty().bind(model.deviceNameProperty());
+
         Circle icon = new Circle(5, Color.GREEN);
         personalPositionLayer = new PositionLayer(icon);
 
@@ -124,13 +131,22 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         Label mapLabel = new Label ("map");
         VBox mapBox = new VBox(mapView, mapLabel);
         mapBox.setAlignment(Pos.TOP_CENTER);
-        mapBox.setOnMouseClicked(e -> pane.showMap());
+        mapBox.setOnMouseClicked(e -> {
+            if (!pane.getMap().getLayers().contains(personalPositionLayer)) {
+                pane.getMap().getLayers().remove(historyPositionLayer);
+                pane.getMap().getLayers().addAll(personalPositionLayer, knownDevicesPositionLayer);
+            }
+            pane.showMap();
+        });
 
         URL historyUrl = this.getClass().getResource(RESOURCES + "/icons/history.png");
         ImageView historyView= new ImageView(historyUrl.toString());
         Label historyLabel = new Label ("history");
         VBox historyBox = new VBox(historyView, historyLabel);
         historyBox.setAlignment(Pos.TOP_CENTER);
+        historyBox.setOnMouseClicked(e -> {
+            model.showingHistoryForDeviceProperty().set(device);
+        });
 
         URL settingsUrl = this.getClass().getResource(RESOURCES + "/icons/settings.png");
         ImageView settingsView= new ImageView(settingsUrl.toString());
@@ -151,6 +167,17 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         menu.getColumnConstraints().addAll(column1, column2, column3, column4);
 
         menu.addRow(0, devicesBox, mapBox, historyBox, settingsBox);
+
+        model.showingHistoryForDeviceProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue != null) {
+                if (!pane.getMap().getLayers().contains(historyPositionLayer)) {
+                    pane.getMap().getLayers().removeAll(personalPositionLayer, knownDevicesPositionLayer);
+                    pane.getMap().getLayers().addAll(historyPositionLayer);
+                }
+                pane.showMap();
+                communicator.retrieveHistory(newValue);
+            }
+        });
 
         return menu;
     }
@@ -180,7 +207,8 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
 
     @Override
     public void deactivate() {
-        this.pane.getMap().getLayers().removeAll(personalPositionLayer, knownDevicesPositionLayer);
+        this.pane.getMap().getLayers().removeAll(personalPositionLayer,
+                knownDevicesPositionLayer, historyPositionLayer);
         this.pane.showMap();
         this.getLocationsTimeline.stop();
     }
@@ -197,4 +225,14 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         }
     }
 
+    @Override
+    public void newHistory(Device device, List<Location> locations) {
+        if (device.equals(model.showingHistoryForDeviceProperty().get())) {
+            historyPositionLayer.removeAllNodes();
+            for (Location location : locations) {
+                Circle circle = new Circle(5, Color.BLUE);
+                historyPositionLayer.addNode(circle, location.getLatitude(), location.getLongitude());
+            }
+        }
+    }
 }

@@ -82,6 +82,14 @@ public class MultiPositionLayer extends Parent implements MapLayer {
     }
 
     /**
+     * Removes all nodes that were added to this layer.
+     */
+    public void removeAllNodes() {
+        nodePositions.clear();
+        getChildren().clear();
+    }
+
+    /**
      * Updates the position of the node.
      *
      * @param node the node to update

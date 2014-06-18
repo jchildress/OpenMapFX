@@ -21,6 +21,7 @@ import static org.lodgon.openmapfx.service.miataru.MiataruService.RESOURCES;
 public class DeviceListCell extends ListCell<Device> {
 
     private final Image removeImage = new Image(this.getClass().getResourceAsStream(RESOURCES + "/icons/remove.png"));
+    private final Image historyImage = new Image(this.getClass().getResourceAsStream(RESOURCES + "/icons/history.png"));
 
     private final Label label;
     private final HBox graphic;
@@ -30,14 +31,23 @@ public class DeviceListCell extends ListCell<Device> {
         removeImageView.setFitHeight(12.0);
         removeImageView.setFitWidth(12.0);
 
+        ImageView historyImageView = new ImageView(historyImage);
+        historyImageView.setFitHeight(12.0);
+        historyImageView.setFitWidth(12.0);
+
         Button remove = new Button("", removeImageView);
         remove.setOnAction(e -> {
             model.trackingDevices().remove(getItem());
         });
 
+        Button history = new Button("", historyImageView);
+        history.setOnAction(e -> {
+            model.showingHistoryForDeviceProperty().set(getItem());
+        });
+
         label = new Label();
 
-        graphic = new HBox(5, remove, label);
+        graphic = new HBox(5, remove, history, label);
         graphic.setAlignment(Pos.CENTER_LEFT);
     }
 
