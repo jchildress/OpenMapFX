@@ -44,12 +44,13 @@ public class Model {
     private final BooleanProperty trackingProperty = new SimpleBooleanProperty(true);
     private final BooleanProperty historyEnabledProperty = new SimpleBooleanProperty(false);
     private final StringProperty deviceNameProperty = new SimpleStringProperty("Demo Device");
-    private final StringProperty dataRetentionTimeProperty = new SimpleStringProperty("12");
+    private final StringProperty dataRetentionTimeProperty = new SimpleStringProperty("30");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://192.168.1.6:8080/miataru/v1");
     private final StringProperty serverLocationProperty = new SimpleStringProperty("service.miataru.com");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://localhost:8080/miataru/v1");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://lodgon.dyndns.org:9999/miataru/v1");
     private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
+    private final StringProperty updateIntervalProperty = new SimpleStringProperty("30s");
 
     private Model() {
     }
@@ -122,4 +123,11 @@ public class Model {
         return historyEnabledProperty.get();
     }
 
+    public StringProperty updateIntervalProperty() {
+        return updateIntervalProperty;
+    }
+
+    public String getUpdateInterval() {
+        return updateIntervalProperty.get();
+    }
 }
