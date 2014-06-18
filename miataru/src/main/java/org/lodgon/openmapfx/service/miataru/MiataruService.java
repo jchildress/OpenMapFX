@@ -32,6 +32,8 @@ import java.util.Map;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -79,12 +81,28 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         this.settingsPane = new SettingsPane();
 
         communicator.addLocationListener(this);
-        getLocationsTimeline = new Timeline(new KeyFrame(Duration.seconds(15.0), e -> {
-            communicator.retrieveLocation(model.trackingDevices());
-        }));
+
+        EventHandler<ActionEvent> onFinished = e -> communicator.retrieveLocation(model.trackingDevices());
+        KeyFrame keyFrame = new KeyFrame(Duration.valueOf(model.getUpdateInterval()), onFinished);
+        getLocationsTimeline = new Timeline(keyFrame);
         getLocationsTimeline.setCycleCount(Timeline.INDEFINITE);
+        model.updateIntervalProperty().addListener((ov, oldValue, newValue) -> {
+            try {
+                Duration duration = Duration.valueOf(newValue);
+                Timeline.Status initialTimelineStatus = getLocationsTimeline.getStatus();
+                if (initialTimelineStatus.equals(Timeline.Status.RUNNING)) {
+                    getLocationsTimeline.stop();
+                }
+                getLocationsTimeline.getKeyFrames().set(0, new KeyFrame(duration, onFinished));
+                if (initialTimelineStatus.equals(Timeline.Status.RUNNING)) {
+                    getLocationsTimeline.play();
+                }
+            } catch (IllegalArgumentException ex) {
+                // ignore
+            }
+        });
     }
-    
+
     @Override
     public String getName() {
         return "Miataru";
