@@ -4,6 +4,7 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
@@ -18,6 +19,7 @@ public class SettingsPane extends GridPane {
     @FXML CheckBox track;
     @FXML CheckBox history;
     @FXML TextField deviceName;
+    @FXML ComboBox<String> dataRetentionTime;
     @FXML TextField serverLocation;
 
     public SettingsPane() {
@@ -33,9 +35,13 @@ public class SettingsPane extends GridPane {
 
     @FXML
     public void initialize() {
+        dataRetentionTime.getItems().addAll("15", "30", "45", "60", "75", "90");
+
+
         track.selectedProperty().bindBidirectional(model.trackingProperty());
         history.selectedProperty().bindBidirectional(model.historyEnabledProperty());
         deviceName.textProperty().bindBidirectional(model.deviceNameProperty());
+        dataRetentionTime.valueProperty().bindBidirectional(model.dataRetentionTimeProperty());
         serverLocation.textProperty().bindBidirectional(model.serverLocationProperty());
     }
 
