@@ -24,6 +24,9 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
   <Label text="CLIENT SETTINGS" GridPane.columnSpan="2">
@@ -54,14 +57,22 @@
       <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
       <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="6" />
       <Label text="Others can find you by your Device Name." wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="8" />
-      <Label text="Server Location" GridPane.rowIndex="10">
+      <Label text="Server Location" GridPane.rowIndex="13">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Label>
       <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="9" />
-      <Label text="Here you need to specify the server you want to use. By default service.miataru.com is set, but you can use your own." wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
-      <TextField fx:id="serverLocation" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+      <Label text="Here you need to specify the server you want to use. By default service.miataru.com is set, but you can use your own." wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="14" GridPane.valignment="TOP" />
+      <TextField fx:id="serverLocation" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+      <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+      <Label text="Data Retention Time" GridPane.rowIndex="10">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label text="When Server Location History is disabled only your last location is stored on the server for the time you specify here." wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
+      <ComboBox fx:id="dataRetentionTime" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
    </children>
    <padding>
       <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />

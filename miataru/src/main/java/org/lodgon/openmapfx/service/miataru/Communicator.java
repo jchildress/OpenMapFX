@@ -99,7 +99,7 @@ public class Communicator {
         System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat + ", server = " + model.getServerServiceLocation());
         try {
             String enableLocationHistory = model.isHistoryEnabled() ? "True" : "False";
-            Config c = new Config().enableLocationHistory(enableLocationHistory).locationDataRetentionTime("15");
+            Config c = new Config().enableLocationHistory(enableLocationHistory).locationDataRetentionTime(model.getDataRetentionTime());
             Location l = new Location().device(deviceName).timestamp(Long.toString(System.currentTimeMillis() / 1000))
                     .longitude(Double.toString(lon)).latitude(Double.toString(lat)).horizontalAccuracy("40.00");
             Location[] la = new Location[1];

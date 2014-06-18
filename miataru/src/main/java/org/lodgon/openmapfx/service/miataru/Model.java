@@ -25,7 +25,9 @@
 package org.lodgon.openmapfx.service.miataru;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -42,6 +44,7 @@ public class Model {
     private final BooleanProperty trackingProperty = new SimpleBooleanProperty(true);
     private final BooleanProperty historyEnabledProperty = new SimpleBooleanProperty(false);
     private final StringProperty deviceNameProperty = new SimpleStringProperty("Demo Device");
+    private final StringProperty dataRetentionTimeProperty = new SimpleStringProperty("12");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://192.168.1.6:8080/miataru/v1");
     private final StringProperty serverLocationProperty = new SimpleStringProperty("service.miataru.com");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://localhost:8080/miataru/v1");
@@ -65,6 +68,14 @@ public class Model {
 
     public String getDeviceName() {
         return deviceNameProperty.get();
+    }
+
+    public StringProperty dataRetentionTimeProperty() {
+        return dataRetentionTimeProperty;
+    }
+
+    public String getDataRetentionTime() {
+        return dataRetentionTimeProperty.get();
     }
 
     public StringProperty serverLocationProperty() {
