@@ -27,52 +27,91 @@
 package org.lodgon.openmapfx.service.miataru;
 
 import java.net.URL;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import org.lodgon.openmapfx.core.LayeredMap;
+import javafx.util.Duration;
+import org.lodgon.openmapfx.core.MultiPositionLayer;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
-import org.lodgon.openmapfx.core.SettingsService;
+import org.lodgon.openmapfx.service.MapViewPane;
 import org.lodgon.openmapfx.service.OpenMapFXService;
 
 /**
  *
  * @author johan
  */
-public class MiataruService implements OpenMapFXService {
+public class MiataruService implements OpenMapFXService, LocationListener  {
 
     private PositionService positionService;
     private ObjectProperty<Position> positionProperty;
-    private String device;
-    private final PositionLayer positionLayer;
-    final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
-    private final DevicesPane devicesPane;
-    private Pane centerPane;
-    private LayeredMap layeredMap;
-    
-    public MiataruService (String device) {
-        this.device =  device;
-        Circle icon = new Circle(5, Color.GREEN);
-        positionLayer = new PositionLayer(icon);
-        this.devicesPane = new DevicesPane();
 
-        Model.getInstance().loadSettings(SettingsService.getInstance());
-    }
+    private final Map<String, Node> deviceNodes = new HashMap<>();
+    private final MultiPositionLayer historyPositionLayer = new MultiPositionLayer();
+    private final MultiPositionLayer knownDevicesPositionLayer = new MultiPositionLayer();
+    private final PositionLayer personalPositionLayer;
+    private Timeline getLocationsTimeline;
+
+    final static String RESOURCES = "/org/lodgon/openmapfx/services/miataru";
+
+    private final Device device;
+
+    private final Model model = new Model();
+    private final Communicator communicator = new Communicator(model);
+
+    private final DevicesPane devicesPane;
+    private final SettingsPane settingsPane;
+
+    private MapViewPane pane;
     
+    public MiataruService() {
+        this.device = new Device();
+        this.device.nameProperty().bind(model.deviceNameProperty());
+
+        Circle icon = new Circle(5, Color.GREEN);
+        personalPositionLayer = new PositionLayer(icon);
+
+        this.devicesPane = new DevicesPane(model);
+        this.settingsPane = new SettingsPane(model);
+
+        communicator.addLocationListener(this);
+
+        EventHandler<ActionEvent> onFinished = e -> communicator.retrieveLocation(model.trackingDevices());
+        KeyFrame keyFrame = new KeyFrame(Duration.valueOf(model.getUpdateInterval()), onFinished);
+        getLocationsTimeline = new Timeline(keyFrame);
+        getLocationsTimeline.setCycleCount(Timeline.INDEFINITE);
+        model.updateIntervalProperty().addListener((ov, oldValue, newValue) -> {
+            try {
+                Duration duration = Duration.valueOf(newValue);
+                Timeline.Status initialTimelineStatus = getLocationsTimeline.getStatus();
+                if (initialTimelineStatus.equals(Timeline.Status.RUNNING)) {
+                    getLocationsTimeline.stop();
+                }
+                getLocationsTimeline.getKeyFrames().set(0, new KeyFrame(duration, onFinished));
+                if (initialTimelineStatus.equals(Timeline.Status.RUNNING)) {
+                    getLocationsTimeline.play();
+                }
+            } catch (IllegalArgumentException ex) {
+                // ignore
+            }
+        });
+    }
+
     @Override
     public String getName() {
         return "Miataru";
@@ -80,87 +119,120 @@ public class MiataruService implements OpenMapFXService {
 
     @Override
     public Node getMenu() {
-        Region w1 = new Region();
-        w1.setPrefWidth(10);
-        Region w2 = new Region();
-        w2.setPrefWidth(10);
-        Region w3 = new Region();
-        w3.setPrefWidth(10);
-        HBox hbox = new HBox();
         URL devicesUrl = this.getClass().getResource(RESOURCES + "/icons/devices.png");
-        ImageView devicesView= new ImageView(devicesUrl.toString());
+        ImageView devicesView = new ImageView(devicesUrl.toString());
         Label devicesLabel = new Label ("devices");
         VBox devicesBox = new VBox(devicesView, devicesLabel);
-        devicesBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        devicesBox.setAlignment(Pos.TOP_CENTER);
+        devicesBox.setOnMouseClicked(e -> pane.setActiveNode(devicesPane));
 
-            @Override
-            public void handle(MouseEvent t) {
-                System.out.println("Clicked on devicesBox");
-             //   AndroidMapper.this.appPane.setCenter(devicesPane);
-                // for some reason, the bottomMenus is below the appPane. Need to refactor this
-             //   bottomMenu.toFront();
-            }
-        });
-        System.out.println("[JVDBG] DBHandler = "+devicesBox.getOnMouseClicked());
         URL mapUrl = this.getClass().getResource(RESOURCES + "/icons/map.png");
         ImageView mapView= new ImageView(mapUrl.toString());
         Label mapLabel = new Label ("map");
-        VBox mapBox = new VBox (mapView, mapLabel);
-        mapBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-              //  AndroidMapper.this.appPane.setCenter(mapPane);
-             //   bottomMenu.toFront();
+        VBox mapBox = new VBox(mapView, mapLabel);
+        mapBox.setAlignment(Pos.TOP_CENTER);
+        mapBox.setOnMouseClicked(e -> {
+            if (!pane.getMap().getLayers().contains(personalPositionLayer)) {
+                pane.getMap().getLayers().remove(historyPositionLayer);
+                pane.getMap().getLayers().addAll(personalPositionLayer, knownDevicesPositionLayer);
             }
+            pane.showMap();
         });
+
         URL historyUrl = this.getClass().getResource(RESOURCES + "/icons/history.png");
         ImageView historyView= new ImageView(historyUrl.toString());
         Label historyLabel = new Label ("history");
         VBox historyBox = new VBox(historyView, historyLabel);
+        historyBox.setAlignment(Pos.TOP_CENTER);
+        historyBox.setOnMouseClicked(e -> {
+            model.showingHistoryForDeviceProperty().set(device);
+        });
+
         URL settingsUrl = this.getClass().getResource(RESOURCES + "/icons/settings.png");
         ImageView settingsView= new ImageView(settingsUrl.toString());
         Label settingsLabel = new Label("settings");
         VBox settingsBox = new VBox (settingsView, settingsLabel);
-        settingsBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        settingsBox.setAlignment(Pos.TOP_CENTER);
+        settingsBox.setOnMouseClicked(e -> pane.setActiveNode(settingsPane));
 
-            @Override
-            public void handle(MouseEvent t) {
-                centerPane.getChildren().clear();
-                centerPane.getChildren().add(devicesPane);
-             //   AndroidMapper.this.appPane.setCenter(settingsPane);
-           //     bottomMenu.toFront();
+        GridPane menu = new GridPane();
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(25.0);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(25.0);
+        ColumnConstraints column3 = new ColumnConstraints();
+        column3.setPercentWidth(25.0);
+        ColumnConstraints column4 = new ColumnConstraints();
+        column4.setPercentWidth(25.0);
+        menu.getColumnConstraints().addAll(column1, column2, column3, column4);
+
+        menu.addRow(0, devicesBox, mapBox, historyBox, settingsBox);
+
+        model.showingHistoryForDeviceProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue != null) {
+                if (!pane.getMap().getLayers().contains(historyPositionLayer)) {
+                    pane.getMap().getLayers().removeAll(personalPositionLayer, knownDevicesPositionLayer);
+                    pane.getMap().getLayers().addAll(historyPositionLayer);
+                }
+                pane.showMap();
+                communicator.retrieveHistory(newValue);
             }
         });
-        hbox.getChildren().addAll(devicesBox, w1, mapBox, w2, historyBox,
-                w3, settingsBox);
-        hbox.setPrefWidth(500);
-        HBox.setHgrow(w1, Priority.ALWAYS);
-        HBox.setHgrow(w2, Priority.ALWAYS);
-        HBox.setHgrow(w3, Priority.ALWAYS);
-        return hbox;
 
+        return menu;
     }
-    
-    @Override
-    public void activate(Pane centerPane, LayeredMap layeredMap) {
-        this.centerPane = centerPane;
-        this.layeredMap = layeredMap;
-        System.out.println("Activate miataruService");
-        layeredMap.getLayers().add(positionLayer);
-        positionService = PositionService.getInstance();
-        positionProperty = positionService.positionProperty();
-        positionProperty.addListener(new InvalidationListener() {
 
-            @Override
-            public void invalidated(Observable observable) {
+    @Override
+    public void activate(MapViewPane pane) {
+        this.pane = pane;
+        System.out.println("Activate miataruService");
+        pane.getMap().getLayers().addAll(personalPositionLayer, knownDevicesPositionLayer);
+        if (positionService == null) {
+            positionService = PositionService.getInstance();
+            positionProperty = positionService.positionProperty();
+            positionProperty.addListener(observable -> {
                 Position position = positionProperty.get();
                 double lat = position.getLatitude();
                 double lon = position.getLongitude();
-                positionLayer.updatePosition(lat, lon);
-                Communicator.updateLocation(device, lat, lon);
-                System.out.println("new position: "+positionProperty.get());
-            }
-        });
+                personalPositionLayer.updatePosition(lat, lon);
+                if (model.trackingEnabledProperty().get()) {
+                    communicator.updateLocation(lat, lon);
+                    System.out.println("new position: "+positionProperty.get());
+                }
+            });
+        }
+
+        getLocationsTimeline.play();
     }
-    
+
+    @Override
+    public void deactivate() {
+        this.pane.getMap().getLayers().removeAll(personalPositionLayer,
+                knownDevicesPositionLayer, historyPositionLayer);
+        this.pane.showMap();
+        this.getLocationsTimeline.stop();
+    }
+
+    @Override
+    public void newLocation(Location location) {
+        Node deviceNode = deviceNodes.get(location.getDevice());
+        if (deviceNode == null) {
+            deviceNode = new Circle(5, Color.RED);
+            deviceNodes.put(location.getDevice(), deviceNode);
+            knownDevicesPositionLayer.addNode(deviceNode, location.getLatitude(), location.getLongitude());
+        } else {
+            knownDevicesPositionLayer.updatePosition(deviceNode, location.getLatitude(), location.getLongitude());
+        }
+    }
+
+    @Override
+    public void newHistory(Device device, List<Location> locations) {
+        if (device.equals(model.showingHistoryForDeviceProperty().get())) {
+            historyPositionLayer.removeAllNodes();
+            for (Location location : locations) {
+                Circle circle = new Circle(5, Color.BLUE);
+                historyPositionLayer.addNode(circle, location.getLatitude(), location.getLongitude());
+            }
+        }
+    }
 }

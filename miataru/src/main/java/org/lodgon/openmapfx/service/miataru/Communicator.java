@@ -24,19 +24,18 @@
  */
 package org.lodgon.openmapfx.service.miataru;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import org.datafx.provider.ObjectDataProvider;
 import org.datafx.provider.ObjectDataProviderBuilder;
 import org.datafx.reader.RestSourceBuilder;
-import org.datafx.reader.converter.JsonConverter;
 
 /**
  *
@@ -44,90 +43,118 @@ import org.datafx.reader.converter.JsonConverter;
  */
 public class Communicator {
 
-//    private static String SERVER = "http://192.168.1.6:8080/miataru/v1";
-  //  private static String SERVER = "http://service.miataru.com/v1";
-   // private static String SERVER = "http://localhost:8080/miataru/v1";
-    private static String SERVER = "http://lodgon.dyndns.org:9999/miataru/v1";
-//
-//    public static void retrieveLocation (Device device) {
-//        GetLocation gl = new GetLocation().device(device.getName());
-//        ObjectProperty<MiataruGetLocationResponse> resultProperty = new SimpleObjectProperty<>();
-//        JsonConverter converter = new JsonConverter(MiataruGetLocationResponse.class);
-//            RestSourceBuilder rsb = RestSourceBuilder.create();
-//            rsb.host(SERVER + "/GetLocation")
-//                    .contentType("application/json")
-//                    .converter(converter)
-//                    .dataString(gl.json());
-//            ObjectDataProviderBuilder odb = ObjectDataProviderBuilder.create();
-//            ObjectDataProvider provider = odb.dataReader(rsb.build()).resultProperty(resultProperty).build();
-//            System.out.println("[JVDBG] sending: "+gl.json());
-//            Platform.runLater(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Worker worker = provider.retrieve();
-//                    worker.stateProperty().addListener(new ChangeListener<Worker.State>() {
-//                        @Override
-//                        public void changed(ObservableValue<? extends Worker.State> ov, Worker.State t, Worker.State t1) {
-//                            System.out.println("status of getloc from " + t + " to " + t1);
-//                            if (t1.equals(Worker.State.SUCCEEDED)) {
-//                                System.out.println("[JVDBG] GETLOCATION result = "+resultProperty.get());
-//                                System.out.println("[JVDBG]  WorkerLocationresult= "+worker.getValue());
-//                            }
-//                        }
-//                    }
-//                    );
-//                }
-//            });
-//    }
-    public static void updateLocation(String deviceName, double lat, double lon) {
-        if (deviceName.isEmpty()) {
-            deviceName = "anonymous android user";
+    private final List<LocationListener> locationListeners = new ArrayList<>();
+
+    private final Model model;
+
+    public Communicator(Model model) {
+        this.model = model;
+    }
+
+    public void addLocationListener(LocationListener locationListener) {
+        this.locationListeners.add(locationListener);
+    }
+
+    public void retrieveLocation(List<Device> devices) {
+        if (!devices.isEmpty()) {
+            GetLocation gl = new GetLocation();
+            for (Device device : devices) {
+                gl.device(device);
+            }
+            ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
+            RestSourceBuilder rsb = RestSourceBuilder.create();
+            rsb.host(model.getServerServiceLocation() + "GetLocation")
+                    .contentType("application/json")
+                    .converter(new PlainTextConverter())
+                    .dataString(gl.json());
+            ObjectDataProviderBuilder odb = ObjectDataProviderBuilder.create();
+            ObjectDataProvider provider = odb.dataReader(rsb.build()).resultProperty(resultProperty).build();
+
+            Platform.runLater(() -> {
+                Worker worker = provider.retrieve();
+                worker.stateProperty().addListener((ov, oldState, newState) -> {
+                    System.out.println("status of retrieveLocation from " + oldState + " to " + newState);
+                    System.out.println("[JVDBG] GETLOCATION response = " + resultProperty.get());
+                    if (newState.equals(Worker.State.SUCCEEDED)) {
+                        GetLocationResponse getLocationResponse = new GetLocationResponse();
+                        getLocationResponse.fromJson(resultProperty.get());
+                        for (LocationListener locationListener : locationListeners) {
+                            for (Location location : getLocationResponse.getLocations()) {
+                                locationListener.newLocation(location);
+                            }
+                        }
+                    } else {
+
+                    }
+                });
+            });
         }
-        System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat+", server = "+SERVER);
+    }
+
+    public void retrieveHistory(Device device) {
+        GetLocationHistory glh = new GetLocationHistory();
+        glh.device(device).amount(25);
+
+        ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
+        RestSourceBuilder rsb = RestSourceBuilder.create();
+        rsb.host(model.getServerServiceLocation() + "GetLocationHistory")
+                .contentType("application/json")
+                .converter(new PlainTextConverter())
+                .dataString(glh.json());
+        ObjectDataProviderBuilder odb = ObjectDataProviderBuilder.create();
+        ObjectDataProvider provider = odb.dataReader(rsb.build()).resultProperty(resultProperty).build();
+
+        Platform.runLater(() -> {
+            Worker worker = provider.retrieve();
+            worker.stateProperty().addListener((ov, oldState, newState) -> {
+                System.out.println("status of retrieveHistory from " + oldState + " to " + newState);
+                System.out.println("[JVDBG] GETLOCATIONHISTORY response = " + resultProperty.get());
+                if (newState.equals(Worker.State.SUCCEEDED)) {
+                    GetLocationHistoryResponse getLocationHistoryResponse = new GetLocationHistoryResponse();
+                    getLocationHistoryResponse.fromJson(resultProperty.get());
+                    for (LocationListener locationListener : locationListeners) {
+                        locationListener.newHistory(device, getLocationHistoryResponse.getLocations());
+                    }
+                }
+            });
+        });
+    }
+
+    public void updateLocation(double lat, double lon) {
+        String deviceName = model.getDeviceName();
+        if (deviceName == null || deviceName.trim().isEmpty()) {
+            deviceName = "Demo Device";
+        }
+        System.out.println("update loc for " + deviceName + " to " + lon + ", lat = " + lat + ", server = " + model.getServerServiceLocation());
         try {
-            Config c = new Config().enableLocationHistory("True").locationDataRetentionTime("15");
-            Location l = new Location().device(deviceName).timestamp(Long.toString(System.currentTimeMillis()/1000))
+            String enableLocationHistory = model.isHistoryEnabled() ? "True" : "False";
+            Config c = new Config().enableLocationHistory(enableLocationHistory).locationDataRetentionTime(model.getDataRetentionTime());
+            Location l = new Location().device(deviceName).timestamp(Long.toString(System.currentTimeMillis() / 1000))
                     .longitude(Double.toString(lon)).latitude(Double.toString(lat)).horizontalAccuracy("40.00");
             Location[] la = new Location[1];
             la[0] = l;
             UpdateLocation ul = new UpdateLocation().config(c).location(la);
             ObjectProperty<String> resultProperty = new SimpleObjectProperty<>();
-     //       JsonConverter converter = new JsonConverter(String.class);
             RestSourceBuilder rsb = RestSourceBuilder.create();
-            rsb.host(SERVER + "/UpdateLocation")
+            rsb.host(model.getServerServiceLocation() + "UpdateLocation")
                     .contentType("application/json")
-       //             .converter(converter)
+                    .converter(new PlainTextConverter())
                     .dataString(ul.json());
             ObjectDataProviderBuilder odb = ObjectDataProviderBuilder.create();
             ObjectDataProvider provider = odb.dataReader(rsb.build()).resultProperty(resultProperty).build();
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    Worker worker = provider.retrieve();
-                    worker.stateProperty().addListener(new ChangeListener<Worker.State>() {
-
-                        @Override
-                        public void changed(ObservableValue<? extends Worker.State> ov, Worker.State t, Worker.State t1) {
-                            System.out.println("status of updateloc from " + t + " to " + t1);
-                            System.out.println("[JVDBG] GETLOCATION result = " + resultProperty.get());
-                            System.out.println("[JVDBG]  WorkerLocationresult= " + worker.getValue());
-                            if (t1.equals(State.FAILED)) {
-                                worker.getException().printStackTrace();
-                            }
-                        }
+            Platform.runLater(() -> {
+                Worker worker = provider.retrieve();
+                worker.stateProperty().addListener((ov, oldState, newState) -> {
+                    System.out.println("status of updateLocation from " + oldState + " to " + newState);
+                    System.out.println("[JVDBG] UPDATELOCATION response = " + resultProperty.get());
+                    if (newState.equals(State.FAILED)) {
+                        worker.getException().printStackTrace();
                     }
-                    );
-                }
+                });
             });
-
         } catch (Exception ex) {
-            System.out.println("Exception while updating location: ");
-            ex.printStackTrace();
-            Logger.getLogger(Communicator.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Communicator.class.getName()).log(Level.SEVERE, "Exception while updating location", ex);
         }
-
     }
-    
-    
-    
+
 }

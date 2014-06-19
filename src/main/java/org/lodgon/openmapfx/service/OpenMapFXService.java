@@ -27,25 +27,29 @@
 package org.lodgon.openmapfx.service;
 
 import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import org.lodgon.openmapfx.core.LayeredMap;
 
 /**
  *
  * @author johan
  */
 public interface OpenMapFXService {
-    
+
     String getName();
-    
+
     Node getMenu();
-    
+
     /**
      * Activate the service. This method will be called by OpenMapFX,
-     * and a pane and layeredmap are provided to the service
-     * @param centerPane  the "main" pane that the service can use. Initially.
+     * and a mapViewPane is provided to the service.
+     * @param mapViewPane the pane that the service can use. Initially,
      * this will be occupied by the map itself.
-     * @param layeredMap  the inital layeredmap
      */
-    void activate(Pane centerPane, LayeredMap layeredMap);
+    void activate(MapViewPane mapViewPane);
+
+    /**
+     * Deactivate the service. This method will be called by OpenMapFX on the
+     * service that was active before a new service is being activated.
+     */
+    void deactivate();
+
 }

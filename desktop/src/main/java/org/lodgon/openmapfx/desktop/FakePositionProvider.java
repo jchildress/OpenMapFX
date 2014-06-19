@@ -29,7 +29,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionProvider;
-import org.lodgon.openmapfx.service.miataru.Communicator;
 
 /**
  *
