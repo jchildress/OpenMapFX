@@ -52,7 +52,7 @@ public class SettingsService {
                 provider = iterator.next();
                 LOG.log(Level.INFO, "The following SettingsProvider will be used: {0}", provider);
             } else {
-                LOG.log(Level.INFO, "Ignoring SettigsProvider {0}.", iterator.next());
+                LOG.log(Level.INFO, "Ignoring SettingsProvider {0}.", iterator.next());
             }
         }
         LOG.log(Level.FINE, "Loading SettingsService completed.");
