@@ -92,6 +92,8 @@ public class Communicator {
     }
 
     public void retrieveHistory(Device device) {
+        model.showingHistoryForDeviceProperty().set(device);
+
         GetLocationHistory glh = new GetLocationHistory();
         glh.device(device).amount(25);
 

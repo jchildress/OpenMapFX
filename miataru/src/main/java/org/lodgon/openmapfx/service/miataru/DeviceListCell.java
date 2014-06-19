@@ -26,7 +26,7 @@ public class DeviceListCell extends ListCell<Device> {
     private final Label label;
     private final HBox graphic;
 
-    public DeviceListCell(Model model) {
+    public DeviceListCell(Communicator communicator, Model model) {
         ImageView removeImageView = new ImageView(removeImage);
         removeImageView.setFitHeight(12.0);
         removeImageView.setFitWidth(12.0);
@@ -42,7 +42,7 @@ public class DeviceListCell extends ListCell<Device> {
 
         Button history = new Button("", historyImageView);
         history.setOnAction(e -> {
-            model.showingHistoryForDeviceProperty().set(getItem());
+            communicator.retrieveHistory(getItem());
         });
 
         label = new Label();
