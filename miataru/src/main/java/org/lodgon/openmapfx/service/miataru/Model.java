@@ -29,22 +29,60 @@ package org.lodgon.openmapfx.service.miataru;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
+import org.lodgon.openmapfx.core.SettingsService;
 
 /**
  *
  * @author johan
  */
 public class Model {
+
+    private static final String SETTING_DEVICE_NAME = "device.name";
+    private static final String SETTING_DEVICES = "devices";
     
     private final static Model instance = new Model();
     private final StringProperty deviceNameProperty = new SimpleStringProperty();
     private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
     
-    private Model() {}
-    
+    private Model() {
+        trackingDevices.addListener((Change<? extends Device> change) -> {
+            if (change.getList().isEmpty()) {
+                SettingsService.getInstance().removeSetting(SETTING_DEVICES);
+            } else {
+                StringBuilder devicesSetting = new StringBuilder();
+                for (int i = 0; i < change.getList().size(); i++) {
+                    if (i > 0) {
+                        devicesSetting.append("|");
+                    }
+                    devicesSetting.append(change.getList().get(i).getName());
+                }
+                SettingsService.getInstance().storeSetting(SETTING_DEVICES, devicesSetting.toString());
+            }
+        });
+    }
+
     public static Model getInstance() {
         return instance;
+    }
+
+    public void loadSettings(SettingsService settingsService) {
+        String localDeviceName = settingsService.getSetting(SETTING_DEVICE_NAME);
+        if (localDeviceName != null) {
+            deviceNameProperty.set(localDeviceName);
+        }
+
+        String deviceNamesSetting = settingsService.getSetting(SETTING_DEVICES);
+        if (deviceNamesSetting != null) {
+            System.out.println("deviceNamesSetting = " + deviceNamesSetting);
+            String[] deviceNames = deviceNamesSetting.split("\\|");
+            for (String deviceName : deviceNames) {
+                Device device = new Device();
+                device.setName(deviceName);
+                trackingDevices.add(device);
+            }
+        }
     }
 
     public ObservableList<Device> trackingDevices() {

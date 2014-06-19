@@ -46,6 +46,7 @@ import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
+import org.lodgon.openmapfx.core.SettingsService;
 import org.lodgon.openmapfx.service.OpenMapFXService;
 
 /**
@@ -68,6 +69,8 @@ public class MiataruService implements OpenMapFXService {
         Circle icon = new Circle(5, Color.GREEN);
         positionLayer = new PositionLayer(icon);
         this.devicesPane = new DevicesPane();
+
+        Model.getInstance().loadSettings(SettingsService.getInstance());
     }
     
     @Override
