@@ -52,10 +52,10 @@ public class SettingsService {
                 provider = iterator.next();
                 LOG.log(Level.INFO, "The following SettingsProvider will be used: {0}", provider);
             } else {
-                System.out.println("Ignoring positionprovider "+iterator.next());
+                LOG.log(Level.INFO, "Ignoring SettigsProvider {0}.", iterator.next());
             }
         }
-        System.out.println("Loading PositionService done");
+        LOG.log(Level.FINE, "Loading SettingsService completed.");
     }
 
     public static SettingsService getInstance() {
