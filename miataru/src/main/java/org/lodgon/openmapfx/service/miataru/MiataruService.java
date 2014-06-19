@@ -33,8 +33,6 @@ import java.util.Map;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -91,9 +89,8 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
 
         communicator.addLocationListener(this);
 
-        EventHandler<ActionEvent> onFinished = e -> communicator.retrieveLocation(model.trackingDevices());
-        KeyFrame keyFrame = new KeyFrame(Duration.valueOf(model.getUpdateInterval()), onFinished);
-        getLocationsTimeline = new Timeline(keyFrame);
+        getLocationsTimeline = new Timeline(new KeyFrame(Duration.ZERO, e -> communicator.retrieveLocation(model.trackingDevices())),
+                new KeyFrame(Duration.valueOf(model.getUpdateInterval())));
         getLocationsTimeline.setCycleCount(Timeline.INDEFINITE);
         model.updateIntervalProperty().addListener((ov, oldValue, newValue) -> {
             try {
@@ -102,7 +99,7 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
                 if (initialTimelineStatus.equals(Timeline.Status.RUNNING)) {
                     getLocationsTimeline.stop();
                 }
-                getLocationsTimeline.getKeyFrames().set(0, new KeyFrame(duration, onFinished));
+                getLocationsTimeline.getKeyFrames().set(1, new KeyFrame(duration));
                 if (initialTimelineStatus.equals(Timeline.Status.RUNNING)) {
                     getLocationsTimeline.play();
                 }
