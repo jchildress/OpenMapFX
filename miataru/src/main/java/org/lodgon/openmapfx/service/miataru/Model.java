@@ -31,7 +31,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
+import javafx.util.converter.BooleanStringConverter;
+import org.lodgon.openmapfx.core.SettingsService;
 
 /**
  *
@@ -39,17 +42,89 @@ import javafx.collections.ObservableList;
  */
 public class Model {
 
-    private final BooleanProperty trackingProperty = new SimpleBooleanProperty(true);
-    private final BooleanProperty historyEnabledProperty = new SimpleBooleanProperty(false);
-    private final StringProperty deviceNameProperty = new SimpleStringProperty("Demo Device");
+    private static final String SETTING_DATA_RETENTION_TIME = "dataRetentionTime";
+    private static final String SETTING_DEVICE_NAME = "deviceName";
+    private static final String SETTING_DEVICES = "devices";
+    private static final String SETTING_HISTORY_ENABLED = "historyEnabled";
+    private static final String SETTING_SERVER_LOCATION = "serverLocation";
+    private static final String SETTING_TRACKING_ENABLED = "trackingEnabled";
+    private static final String SETTING_UPDATE_INTERVAL = "updateInterval";
+
     private final StringProperty dataRetentionTimeProperty = new SimpleStringProperty("30");
+    private final StringProperty deviceNameProperty = new SimpleStringProperty("Demo Device");
+    private final BooleanProperty historyEnabledProperty = new SimpleBooleanProperty(false);
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://192.168.1.6:8080/miataru/v1");
     private final StringProperty serverLocationProperty = new SimpleStringProperty("service.miataru.com");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://localhost:8080/miataru/v1");
 //    private final StringProperty serverProperty = new SimpleStringProperty("http://lodgon.dyndns.org:9999/miataru/v1");
     private final ObservableList<Device> trackingDevices = FXCollections.observableArrayList();
+    private final StringProperty trackingDevicesSettingProperty = new SimpleStringProperty("");
+    private final BooleanProperty trackingEnabledProperty = new SimpleBooleanProperty(true);
     private final StringProperty updateIntervalProperty = new SimpleStringProperty("30s");
     private final ObjectProperty<Device> showingHistoryForDeviceProperty = new SimpleObjectProperty<>();
+
+    public Model() {
+        SettingsService settingsService = SettingsService.getInstance();
+
+        String dataRetentionTimeSetting = settingsService.getSetting(SETTING_DATA_RETENTION_TIME);
+        if (dataRetentionTimeSetting != null) {
+            dataRetentionTimeProperty.set(dataRetentionTimeSetting);
+        }
+
+        String deviceNameSetting = settingsService.getSetting(SETTING_DEVICE_NAME);
+        if (deviceNameSetting != null) {
+            deviceNameProperty.set(deviceNameSetting);
+        }
+
+        String historyEnabledSetting = settingsService.getSetting(SETTING_HISTORY_ENABLED);
+        if (historyEnabledSetting != null) {
+            historyEnabledProperty.set(Boolean.parseBoolean(historyEnabledSetting));
+        }
+
+        String serverLocationSetting = settingsService.getSetting(SETTING_SERVER_LOCATION);
+        if (serverLocationSetting != null) {
+            serverLocationProperty.set(serverLocationSetting);
+        }
+
+        String trackingEnabledSetting = settingsService.getSetting(SETTING_TRACKING_ENABLED);
+        if (trackingEnabledSetting != null) {
+            trackingEnabledProperty.set(Boolean.parseBoolean(trackingEnabledSetting));
+        }
+
+        String updateIntervalSetting = settingsService.getSetting(SETTING_UPDATE_INTERVAL);
+        if (updateIntervalSetting != null) {
+            updateIntervalProperty.set(updateIntervalSetting);
+        }
+
+        String trackingDevicesSetting = settingsService.getSetting(SETTING_DEVICES);
+        if (trackingDevicesSetting != null) {
+            trackingDevicesSettingProperty.set(trackingDevicesSetting);
+            String[] trackingDeviceNames = trackingDevicesSetting.split("\\|");
+            for (String trackingDeviceName : trackingDeviceNames) {
+                Device trackingDevice = new Device();
+                trackingDevice.setName(trackingDeviceName);
+                trackingDevices.add(trackingDevice);
+            }
+        }
+
+        dataRetentionTimeProperty.addListener(new SettingChangeListener<>(SETTING_DATA_RETENTION_TIME));
+        deviceNameProperty.addListener(new SettingChangeListener<>(SETTING_DEVICE_NAME));
+        historyEnabledProperty.addListener(new SettingChangeListener<>(SETTING_HISTORY_ENABLED, new BooleanStringConverter()));
+        serverLocationProperty.addListener(new SettingChangeListener<>(SETTING_SERVER_LOCATION));
+        trackingDevicesSettingProperty.addListener(new SettingChangeListener<>(SETTING_DEVICES));
+        trackingEnabledProperty.addListener(new SettingChangeListener<>(SETTING_TRACKING_ENABLED, new BooleanStringConverter()));
+        updateIntervalProperty.addListener(new SettingChangeListener<>(SETTING_UPDATE_INTERVAL));
+        trackingDevices.addListener((Change<? extends Device> change) -> {
+            StringBuilder sbTrackingDevicesSetting = new StringBuilder();
+            for (int i = 0; i < change.getList().size(); i++) {
+                if (i > 0) {
+                    sbTrackingDevicesSetting.append("|");
+                }
+                sbTrackingDevicesSetting.append(change.getList().get(i).getName());
+            }
+            trackingDevicesSettingProperty.set(sbTrackingDevicesSetting.toString());
+        });
+    }
 
     public ObservableList<Device> trackingDevices() {
         return trackingDevices;
@@ -99,12 +174,12 @@ public class Model {
         return serverServiceLocation;
     }
 
-    public BooleanProperty trackingProperty() {
-        return trackingProperty;
+    public BooleanProperty trackingEnabledProperty() {
+        return trackingEnabledProperty;
     }
 
-    public boolean isTracking() {
-        return trackingProperty.get();
+    public boolean isTrackingEnabled() {
+        return trackingEnabledProperty.get();
     }
 
     public BooleanProperty historyEnabledProperty() {

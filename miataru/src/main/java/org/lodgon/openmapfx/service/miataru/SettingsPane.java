@@ -41,7 +41,7 @@ public class SettingsPane extends GridPane {
         dataRetentionTime.getItems().addAll("15", "30", "45", "60", "75", "90");
         updateInterval.getItems().addAll("10s", "30s", "1m", "2m");
 
-        track.selectedProperty().bindBidirectional(model.trackingProperty());
+        track.selectedProperty().bindBidirectional(model.trackingEnabledProperty());
         history.selectedProperty().bindBidirectional(model.historyEnabledProperty());
         deviceName.textProperty().bindBidirectional(model.deviceNameProperty());
         dataRetentionTime.valueProperty().bindBidirectional(model.dataRetentionTimeProperty());
