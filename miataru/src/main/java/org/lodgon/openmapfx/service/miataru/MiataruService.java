@@ -86,7 +86,7 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         Circle icon = new Circle(5, Color.GREEN);
         personalPositionLayer = new PositionLayer(icon);
 
-        this.devicesPane = new DevicesPane(model);
+        this.devicesPane = new DevicesPane(communicator, model);
         this.settingsPane = new SettingsPane(model);
 
         communicator.addLocationListener(this);
@@ -145,7 +145,7 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         VBox historyBox = new VBox(historyView, historyLabel);
         historyBox.setAlignment(Pos.TOP_CENTER);
         historyBox.setOnMouseClicked(e -> {
-            model.showingHistoryForDeviceProperty().set(device);
+            communicator.retrieveHistory(device);
         });
 
         URL settingsUrl = this.getClass().getResource(RESOURCES + "/icons/settings.png");
@@ -167,17 +167,6 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         menu.getColumnConstraints().addAll(column1, column2, column3, column4);
 
         menu.addRow(0, devicesBox, mapBox, historyBox, settingsBox);
-
-        model.showingHistoryForDeviceProperty().addListener((ov, oldValue, newValue) -> {
-            if (newValue != null) {
-                if (!pane.getMap().getLayers().contains(historyPositionLayer)) {
-                    pane.getMap().getLayers().removeAll(personalPositionLayer, knownDevicesPositionLayer);
-                    pane.getMap().getLayers().addAll(historyPositionLayer);
-                }
-                pane.showMap();
-                communicator.retrieveHistory(newValue);
-            }
-        });
 
         return menu;
     }
@@ -233,6 +222,13 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
                 Circle circle = new Circle(5, Color.BLUE);
                 historyPositionLayer.addNode(circle, location.getLatitude(), location.getLongitude());
             }
+
+            if (!pane.getMap().getLayers().contains(historyPositionLayer)) {
+                pane.getMap().getLayers().removeAll(personalPositionLayer, knownDevicesPositionLayer);
+                pane.getMap().getLayers().addAll(historyPositionLayer);
+            }
+            pane.showMap();
         }
     }
+
 }
