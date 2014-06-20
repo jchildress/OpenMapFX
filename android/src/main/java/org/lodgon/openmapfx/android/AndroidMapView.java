@@ -37,7 +37,6 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
@@ -57,25 +56,25 @@ import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.PositionService;
-import org.lodgon.openmapfx.service.miataru.Communicator;
+import org.lodgon.openmapfx.service.MapViewPane;
 import org.lodgon.openmapfx.service.miataru.MiataruService;
 
 // import org.scenicview.ScenicView;
 
 public class AndroidMapView extends Application {
-    
+
     private LocationManager lm;
     private String provider;
     private LayeredMap layeredMap;
     boolean real = true;
     BorderPane appPane;
-    Pane mapPane;
+    MapViewPane mapPane;
     private Scene scene;
     private Stage stage;
     private final int STARTZOOM = 14;
     private boolean debug = true;
     private PositionService positionService;
-    
+
     @Override
     public void start(Stage primaryStage) {
         EventHandler backEvent = createBackEvent();
@@ -87,29 +86,26 @@ public class AndroidMapView extends Application {
 
         layeredMap = new LayeredMap(mapProvider);
         layeredMap.setZoom(14);
-        System.out.println("Start miataru");
-        MiataruService miataru = new MiataruService("my device");
-        System.out.println("started miataru");
-        if (real) {
-            positionService = PositionService.getInstance();//new AndroidPositionService();
-           
-            showMyLocation();
-            positionService.positionProperty().addListener(new InvalidationListener() {
-
-                @Override
-                public void invalidated(Observable observable) {
-                    Position p = positionService.positionProperty().get();
-                    System.out.println("Mapview got new position: "+p);
-                    positionLayer.updatePosition(p.getLatitude(), p.getLongitude());
-                    Communicator.updateLocation("johan", p.getLatitude(), p.getLongitude());
-                }
-            });
-        } else {
-            fakeUpdates();
-        }
   
-        mapPane = new Pane();
-        mapPane.getChildren().addAll(layeredMap);//, c);
+        mapPane = new MapViewPane(layeredMap);
+
+        System.out.println("Start miataru");
+        MiataruService miataru = new MiataruService();
+        miataru.activate(mapPane);
+        System.out.println("started miataru");
+
+        positionService = PositionService.getInstance();//new AndroidPositionService();
+
+        showMyLocation();
+        positionService.positionProperty().addListener(new InvalidationListener() {
+
+            @Override
+            public void invalidated(Observable observable) {
+                Position p = positionService.positionProperty().get();
+                System.out.println("Mapview got new position: "+p);
+                positionLayer.updatePosition(p.getLatitude(), p.getLongitude());
+            }
+        });
         
         appPane = new BorderPane();
         appPane.setCenter(mapPane);
@@ -158,40 +154,6 @@ public class AndroidMapView extends Application {
 
         };
         return answer;
-    }
-    
-    private void fakeUpdates() {
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    double lat0 = 50.8456;
-                    double lon0 = 4.7238;
-                    while (true) {
-                        Thread.sleep(10000);
-                        lat0 = lat0 + Math.random() * .00001;
-                        lon0 = lon0 + Math.random() * .00001;
-                        final double lat = lat0;
-                        final double lon = lon0;
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                layeredMap.setCenter(lat, lon);
-                    Communicator.updateLocation("johan", lat, lon);
-
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        };
-        Thread t = new Thread(r);
-        t.setDaemon(true);
-        t.start();
     }
 
     /**
