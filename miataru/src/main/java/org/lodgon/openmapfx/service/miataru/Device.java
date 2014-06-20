@@ -26,7 +26,6 @@
  */
 package org.lodgon.openmapfx.service.miataru;
 
-import java.util.Objects;
 import java.util.UUID;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -38,7 +37,7 @@ import javafx.beans.property.StringProperty;
 public class Device {
 
     private String id = UUID.randomUUID().toString();
-    private StringProperty nameProperty = new SimpleStringProperty();
+    private final StringProperty nameProperty = new SimpleStringProperty();
 
     public StringProperty nameProperty() {
         return nameProperty;
@@ -69,7 +68,7 @@ public class Device {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 31 * hash + Objects.hashCode(this.id);
+        hash = 31 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
     }
 
@@ -82,10 +81,7 @@ public class Device {
             return false;
         }
         final Device other = (Device) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return (this.id == other.id) || (this.id != null && this.id.equals(other.id));
     }
 
 }
