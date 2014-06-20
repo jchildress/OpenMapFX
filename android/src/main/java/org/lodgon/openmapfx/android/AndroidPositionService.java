@@ -42,7 +42,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafxports.android.FXActivity;
 import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionProvider;
-import org.lodgon.openmapfx.core.PositionService;
 
 /**
  *
