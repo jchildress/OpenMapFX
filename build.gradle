@@ -64,6 +64,7 @@ project (':miataru') {
             compile group:'org.javafxdata', name:'datafx-core', version:'2.0.2'
             compile project(":");
     }
+    apply plugin: 'retrolambda'
 }
 
 project (':desktop') {
