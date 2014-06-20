@@ -55,6 +55,11 @@ public class SettingsService {
                 LOG.log(Level.INFO, "Ignoring SettingsProvider {0}.", iterator.next());
             }
         }
+
+        if (provider == null) {
+            LOG.log(Level.WARNING, "No SettingsProvider could be found.");
+        }
+
         LOG.log(Level.FINE, "Loading SettingsService completed.");
     }
 
