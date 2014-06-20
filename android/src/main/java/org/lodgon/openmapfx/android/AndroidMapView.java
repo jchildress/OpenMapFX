@@ -26,29 +26,24 @@
  */
 package org.lodgon.openmapfx.android;
 
-import android.content.Context;
-import android.location.LocationManager;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
@@ -59,101 +54,115 @@ import org.lodgon.openmapfx.core.PositionService;
 import org.lodgon.openmapfx.service.MapViewPane;
 import org.lodgon.openmapfx.service.miataru.MiataruService;
 
-// import org.scenicview.ScenicView;
-
 public class AndroidMapView extends Application {
 
-    private LocationManager lm;
-    private String provider;
+    private static final Logger LOG = Logger.getLogger(AndroidMapView.class.getName());
+
     private LayeredMap layeredMap;
-    boolean real = true;
-    BorderPane appPane;
-    MapViewPane mapPane;
+    private BorderPane appPane;
+    private MapViewPane mapPane;
     private Scene scene;
     private Stage stage;
-    private final int STARTZOOM = 14;
-    private boolean debug = true;
-    private PositionService positionService;
 
     @Override
     public void start(Stage primaryStage) {
-        EventHandler backEvent = createBackEvent();
-        System.out.println("[JVDBG] START APPLICATION");
         this.stage = primaryStage;
-        double lat = 50.8456;
-        double lon = 4.7238;
-                DefaultBaseMapProvider mapProvider = new DefaultBaseMapProvider();
+
+        MiataruService miataru = new MiataruService();
+
+        DefaultBaseMapProvider mapProvider = new DefaultBaseMapProvider();
 
         layeredMap = new LayeredMap(mapProvider);
-        layeredMap.setZoom(14);
-  
+        layeredMap.setZoom(11);
+        layeredMap.setCenter(50.8456, 4.7238);
+
         mapPane = new MapViewPane(layeredMap);
 
-        System.out.println("Start miataru");
-        MiataruService miataru = new MiataruService();
-        miataru.activate(mapPane);
-        System.out.println("started miataru");
-
-        positionService = PositionService.getInstance();//new AndroidPositionService();
-
-        showMyLocation();
-        positionService.positionProperty().addListener(new InvalidationListener() {
-
-            @Override
-            public void invalidated(Observable observable) {
-                Position p = positionService.positionProperty().get();
-                System.out.println("Mapview got new position: "+p);
-                positionLayer.updatePosition(p.getLatitude(), p.getLongitude());
-            }
-        });
-        
         appPane = new BorderPane();
         appPane.setCenter(mapPane);
-        Screen screen = Screen.getPrimary();
-        Rectangle2D b = screen.getVisualBounds();
-        scene = new Scene(appPane, b.getWidth(), b.getHeight());
-      //  ScenicView.show(scene);
-        primaryStage.setTitle("Location Tracker");
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        scene.setOnKeyPressed(backEvent);
-        scene.getStylesheets().add("style.css");
-        Screen.getScreens().addListener(new ListChangeListener<Screen>() {
 
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends Screen> change) {
-                while (change.next()) {
-                    System.out.println("[JVDBG] Screenchange ");
-                  
-                    Screen screen = Screen.getPrimary();
-                    Rectangle2D b = screen.getVisualBounds();
-                    Label holdon = new Label ("hold on...");
-                    scene.setRoot(holdon);
-                    scene = new Scene(appPane, b.getWidth(), b.getHeight());
-                    scene.setOnKeyPressed(backEvent);
+        Screen primaryScreen = Screen.getPrimary();
+        Rectangle2D visualBounds = primaryScreen.getVisualBounds();
+        LOG.log(Level.INFO, "Current screen bounds: " + visualBounds.getWidth() + "x" + visualBounds.getHeight());
 
-                    stage.setScene(scene);
-                }
+        URL myLocationImageUrl = this.getClass().getResource("icons/mylocation.png");
+        Image myLocationImage = new Image(myLocationImageUrl.toString());
+        PositionLayer positionLayer = new PositionLayer(myLocationImage);
+        layeredMap.getLayers().add(positionLayer);
+
+        Label availableServicesLabel = new Label("Available Services");
+        availableServicesLabel.setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.setPrefWidth(400.0);
+        CustomMenuItem customMenuItem = new CustomMenuItem(availableServicesLabel);
+        CheckMenuItem activateMiataruService = new CheckMenuItem("Miataru");
+        activateMiataruService.setSelected(false);
+        activateMiataruService.selectedProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue) {
+                layeredMap.getLayers().remove(positionLayer);
+                miataru.activate(mapPane);
+                appPane.setBottom(miataru.getMenu());
+            } else {
+                layeredMap.getLayers().add(positionLayer);
+                miataru.deactivate();
+                appPane.setBottom(null);
             }
         });
-      layeredMap.setCenter(lat, lon);
-   //   URL im = this.getClass().getResource("icons/mylocation.png");
-    //  Image image = new Image(im.toString());
-    }
+        contextMenu.getItems().addAll(customMenuItem, activateMiataruService);
 
-    private EventHandler<KeyEvent> createBackEvent() {
-        EventHandler<KeyEvent> answer = new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                 System.out.println("key pressed: "+t);
-                if (t.getCode().equals(KeyCode.ESCAPE)) {
-                    System.exit(1);
+        // intercept when the user presses one of the phone buttons
+        EventHandler<KeyEvent> keyEventHandler = (e) -> {
+            LOG.log(Level.INFO, "A key was pressed: " + e);
+
+            if (e.getCode().equals(KeyCode.ESCAPE)) {
+                // the user pressed the back button, so we quit the application
+                System.exit(1);
+            } else if (e.getCode().equals(KeyCode.CONTEXT_MENU)) {
+                // the user pressed the context menu button, so open the menu
+                if (contextMenu.isShowing()) {
+                    contextMenu.hide();
+                } else {
+                    contextMenu.show(primaryStage, visualBounds.getWidth(), visualBounds.getHeight());
                 }
             }
-
         };
-        return answer;
+
+        // update the position only when the miataru service is not active
+        PositionService positionService = PositionService.getInstance();
+        positionService.positionProperty().addListener(ov -> {
+            if (!activateMiataruService.isSelected()) {
+                Position currentPosition = positionService.positionProperty().get();
+                positionLayer.updatePosition(currentPosition.getLatitude(), currentPosition.getLongitude());
+                layeredMap.setCenter(currentPosition.getLatitude(), currentPosition.getLongitude());
+            }
+        });
+
+        // create the main application scene
+        scene = new Scene(appPane, visualBounds.getWidth(), visualBounds.getHeight());
+
+        // show the primary stage
+        primaryStage.setTitle("Location Tracker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        scene.setOnKeyPressed(keyEventHandler);
+
+        // handle changes in screen rotation etc.
+        Screen.getScreens().addListener((ListChangeListener.Change<? extends Screen> change) -> {
+            while (change.next()) {
+                Screen updatedPrimaryScreen = Screen.getPrimary();
+                Rectangle2D updatedVisualBounds = updatedPrimaryScreen.getVisualBounds();
+
+                LOG.log(Level.INFO, "Screen changed, new screen bounds: " + visualBounds.getWidth() + "x" + visualBounds.getHeight());
+
+                Label holdon = new Label("hold on...");
+                scene.setRoot(holdon);
+                scene = new Scene(appPane, updatedVisualBounds.getWidth(), updatedVisualBounds.getHeight());
+                scene.setOnKeyPressed(keyEventHandler);
+
+                stage.setScene(scene);
+            }
+        });
     }
 
     /**
@@ -168,29 +177,4 @@ public class AndroidMapView extends Application {
         launch(args);
     }
 
-    long last = System.currentTimeMillis();
-    PositionLayer positionLayer;
-    
-    private void showMyLocation () {
-     URL im = this.getClass().getResource("icons/mylocation.png");
-        Image image = new Image(im.toString());
-        positionLayer = new PositionLayer(image);
-        layeredMap.getLayers().add(positionLayer);
-    }
-   
-    private String getDeviceName(Context ctx) {
-        try {
-            FileInputStream openFileInput = ctx.openFileInput("mydevice");
-            BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput));
-            String entry = br.readLine();
-            return entry;
-        } catch (FileNotFoundException ex) {
-            System.out.println("[JVDBG] MyDevice not found");
-            Logger.getLogger(AndroidMapView.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            System.out.println("[JVDBG] MyDevice not readable");
-            Logger.getLogger(AndroidMapView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
 }
