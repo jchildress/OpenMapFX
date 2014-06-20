@@ -47,7 +47,7 @@ import org.lodgon.openmapfx.core.PositionProvider;
  *
  * @author johan
  */
-public class AndroidPositionService implements PositionProvider, LocationListener {
+public class AndroidPositionProvider implements PositionProvider, LocationListener {
     
     ObjectProperty<Position> positionProperty = new SimpleObjectProperty<>();
 
@@ -58,7 +58,7 @@ public class AndroidPositionService implements PositionProvider, LocationListene
     private final double lon;
     private boolean debug = true;
     
-    public AndroidPositionService () {
+    public AndroidPositionProvider () {
           Context ctx = FXActivity.getInstance();
            
             Object systemService = ctx.getSystemService(FXActivity.LOCATION_SERVICE);
@@ -85,7 +85,7 @@ public class AndroidPositionService implements PositionProvider, LocationListene
             Thread t = new Thread() {
                 public void run() {
                     Looper.prepare();
-                    lm.requestLocationUpdates(provider, 400, 1, AndroidPositionService.this);
+                    lm.requestLocationUpdates(provider, 400, 1, AndroidPositionProvider.this);
                     Looper.loop();
                 }
             };
