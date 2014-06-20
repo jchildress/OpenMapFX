@@ -82,7 +82,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </Label>
-      <Label text="How often do you want to get the location from other devices in your Known Devices list. This is not the update interval for" wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="17" GridPane.valignment="TOP" />
+      <Label text="How often do you want to get the location from other devices in your Known Devices list. This is not the update interval for reporting locations." wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="17" GridPane.valignment="TOP" />
       <ComboBox fx:id="updateInterval" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="16" />
    </children>
    <padding>
