@@ -30,6 +30,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
@@ -55,6 +57,8 @@ import org.lodgon.openmapfx.service.OpenMapFXService;
  * @author johan
  */
 public class MiataruService implements OpenMapFXService, LocationListener  {
+
+    private static final Logger LOG = Logger.getLogger(MiataruService.class.getName());
 
     private PositionService positionService;
     private ObjectProperty<Position> positionProperty;
@@ -170,9 +174,18 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
 
     @Override
     public void activate(MapViewPane pane) {
+        LOG.log(Level.INFO, "Activating Miataru Service");
+
         this.pane = pane;
-        System.out.println("Activate miataruService");
         pane.getMap().getLayers().addAll(personalPositionLayer, knownDevicesPositionLayer);
+
+        double currentLatitude = pane.getMap().centerLatitudeProperty().get();
+        double currentLongitude = pane.getMap().centerLongitudeProperty().get();
+        personalPositionLayer.updatePosition(currentLatitude, currentLongitude);
+        if (model.trackingEnabledProperty().get()) {
+            communicator.updateLocation(currentLatitude, currentLongitude);
+        }
+
         if (positionService == null) {
             positionService = PositionService.getInstance();
             positionProperty = positionService.positionProperty();
@@ -193,6 +206,8 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
 
     @Override
     public void deactivate() {
+        LOG.log(Level.INFO, "Deactivating Miataru Service");
+
         this.pane.getMap().getLayers().removeAll(personalPositionLayer,
                 knownDevicesPositionLayer, historyPositionLayer);
         this.pane.showMap();
