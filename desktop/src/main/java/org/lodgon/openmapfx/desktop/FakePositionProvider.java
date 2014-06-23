@@ -53,9 +53,6 @@ public class FakePositionProvider implements PositionProvider {
                     double lat0 = 50.8456;
                     double lon0 = 4.7238;
                     while (true) {
-                        Thread.sleep(10000);
-                        lat0 = lat0 + Math.random() * .00001;
-                        lon0 = lon0 + Math.random() * .00001;
                         final double lat = lat0;
                         final double lon = lon0;
                         Platform.runLater(new Runnable() {
@@ -65,6 +62,9 @@ public class FakePositionProvider implements PositionProvider {
                                 positionProperty.set(p);
                             }
                         });
+                        Thread.sleep(10000);
+                        lat0 = lat0 + Math.random() * .00001;
+                        lon0 = lon0 + Math.random() * .00001;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
