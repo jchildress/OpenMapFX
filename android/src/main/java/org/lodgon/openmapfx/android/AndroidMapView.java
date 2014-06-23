@@ -109,6 +109,7 @@ public class AndroidMapView extends Application {
             }
         });
         contextMenu.getItems().addAll(customMenuItem, activateMiataruService);
+        activateMiataruService.setSelected(true);
 
         // intercept when the user presses one of the phone buttons
         EventHandler<KeyEvent> keyEventHandler = (e) -> {
@@ -119,11 +120,11 @@ public class AndroidMapView extends Application {
                 System.exit(1);
             } else if (e.getCode().equals(KeyCode.CONTEXT_MENU)) {
                 // the user pressed the context menu button, so open the menu
-                if (contextMenu.isShowing()) {
-                    contextMenu.hide();
-                } else {
-                    contextMenu.show(primaryStage, visualBounds.getWidth(), visualBounds.getHeight());
-                }
+//                if (contextMenu.isShowing()) {
+//                    contextMenu.hide();
+//                } else {
+//                    contextMenu.show(primaryStage, visualBounds.getWidth(), visualBounds.getHeight());
+//                }
             }
         };
 
