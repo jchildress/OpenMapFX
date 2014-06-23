@@ -47,4 +47,25 @@ public class Marker extends Group {
         getChildren().addAll(markerShadow, markerIcon);
     }
 
+    /**
+     * Half the width of the marker image is the actual point around which the
+     * x coordinate of the location should be centered.
+     *
+     * @return the point where the x coordinate of the location should be
+     * centered
+     */
+    public double getCenterX() {
+        return markerIconImage.getWidth() / -2.0;
+    }
+
+    /**
+     * The bottom of the marker image is the actual point around which the y
+     * coordinate of the location should be centered.
+     *
+     * @return the point where the y coordinate of the location should be
+     * centered
+     */
+    public double getCenterY() {
+        return markerIconImage.getHeight() * -1.0;
+    }
 }

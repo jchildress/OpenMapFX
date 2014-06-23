@@ -33,65 +33,83 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
+ * A PositionLayer is used to show an Image or a Node at the position that is
+ * maintained by this layer. Once a PositionLayer is created, it should be added
+ * to a LayeredMap. This LayeredMap is further responsible for doing the
+ * required calculations.
  *
+ * @see LayeredMap#getLayers()
  * @author johan
  */
 public class PositionLayer extends Parent implements MapLayer {
-    
+
     private double lat;
     private double lon;
-    // private ImageView imageView;
-    private Node icon;
-    private double imageWidth, imageHeight;
+    private final Node icon;
+    private final double iconTranslateX, iconTranslateY;
     private LayeredMap layeredMap;
-    
+
     /**
      * Create a PositionLayer with an image that will be shown on the map at the
-     * position of this PositionLayer. 
-     * The image is always rendered on the position maintained in this layer.
-     * Once created, a PositionLayer should be added to a LayeredMap.
-     * The LayeredMap is responsible for doing the required calculations.
+     * position of this PositionLayer. The center of the image will be used for
+     * the position of the PositionLayer. Once created, a PositionLayer should
+     * be added to a LayeredMap. The LayeredMap is responsible for doing the
+     * required calculations.
+     *
      * @param image the image that will be shown at the position of this layer
      */
-    public PositionLayer (Image image) {
-        icon = new ImageView(image);
-        imageWidth = image.getWidth();
-        imageHeight = image.getHeight();
-        icon.setVisible(false);
+    public PositionLayer(Image image) {
+        this(new ImageView(image), image.getWidth() / -2.0, image.getHeight() / -2.0);
+    }
+
+    /**
+     * Create a PositionLayer with a specific Node that serves as the icon for
+     * the location. The node can be styled using css.
+     *
+     * @param icon the icon Node.
+     */
+    public PositionLayer(Node icon) {
+        this(icon, 0.0, 0.0);
+    }
+
+    /**
+     * Create a PositionLayer with a specific Node that serves as the icon for
+     * the location. The node can be styled using css. When the position
+     * changes, the provided translateX and translateY will be added to the new
+     * x and y translations.
+     *
+     * @param icon the icon Node.
+     * @param translateX extra x translation to add to the icon
+     * @param translateY extra y translation to add to the icon
+     */
+    public PositionLayer(Node icon, double translateX, double translateY) {
+        this.icon = icon;
+        this.icon.setVisible(false);
+        this.iconTranslateX = translateX;
+        this.iconTranslateY = translateY;
         getChildren().add(icon);
     }
-    
-    /**
-     * Create a PositionLayer with a specific Node that serves as the icon
-     * for the location. The node can be styled using css.
-     * @param node  the icon Node.
-     */
-    public PositionLayer (Node node) {
-        icon = node;
-        getChildren().add(node);
-    }
-    
+
     @Override
     public Node getView() {
         return this;
     }
-    
-        
+
     public void updatePosition(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
         refreshLayer();
     }
-    
-     protected void refreshLayer() {
+
+    protected void refreshLayer() {
         Point2D cartPoint = this.layeredMap.getMapPoint(lat, lon);
         if (cartPoint == null) {
             System.out.println("[JVDBG] Null cartpoint, probably no scene, dont show.");
             return;
         }
         icon.setVisible(true);
-        icon.setTranslateX(cartPoint.getX() - imageWidth/2);
-        icon.setTranslateY(cartPoint.getY() - imageHeight/2);
+        icon.setTranslateX(cartPoint.getX() + iconTranslateX);
+        icon.setTranslateY(cartPoint.getY() + iconTranslateY);
     }
 
     @Override
@@ -104,4 +122,5 @@ public class PositionLayer extends Parent implements MapLayer {
         this.layeredMap.yShiftProperty().addListener(e -> refreshLayer());
         refreshLayer();
     }
+
 }

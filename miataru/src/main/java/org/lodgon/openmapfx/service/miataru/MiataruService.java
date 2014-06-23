@@ -85,8 +85,9 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         this.device = new Device();
         this.device.nameProperty().bind(model.deviceNameProperty());
 
-//        Circle icon = new Circle(5, Color.GREEN);
-        personalPositionLayer = new PositionLayer(new Marker());
+        Marker personalPositionMarker = new Marker();
+        personalPositionLayer = new PositionLayer(personalPositionMarker,
+                personalPositionMarker.getCenterX(), personalPositionMarker.getCenterY());
 
         this.devicesPane = new DevicesPane(communicator, model);
         this.settingsPane = new SettingsPane(model);
