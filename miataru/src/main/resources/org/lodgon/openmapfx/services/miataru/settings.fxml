@@ -75,7 +75,12 @@
          </font>
       </Label>
       <Label text="When Server Location History is disabled only your last location is stored on the server for the time you specify here." wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
-      <ComboBox fx:id="dataRetentionTime" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+      <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+         <children>
+            <ComboBox fx:id="dataRetentionTime" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+            <Label text="minutes" />
+         </children>
+      </HBox>
       <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="15" />
       <Label text="Update Interval" GridPane.rowIndex="16">
          <font>
