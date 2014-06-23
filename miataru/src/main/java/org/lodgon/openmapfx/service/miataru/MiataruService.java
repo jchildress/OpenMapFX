@@ -180,13 +180,6 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
         this.pane = pane;
         pane.getMap().getLayers().addAll(personalPositionLayer, knownDevicesPositionLayer);
 
-        double currentLatitude = pane.getMap().centerLatitudeProperty().get();
-        double currentLongitude = pane.getMap().centerLongitudeProperty().get();
-        personalPositionLayer.updatePosition(currentLatitude, currentLongitude);
-        if (model.trackingEnabledProperty().get()) {
-            communicator.updateLocation(currentLatitude, currentLongitude);
-        }
-
         if (positionService == null) {
             positionService = PositionService.getInstance();
             positionProperty = positionService.positionProperty();
@@ -200,6 +193,15 @@ public class MiataruService implements OpenMapFXService, LocationListener  {
                     System.out.println("new position: "+positionProperty.get());
                 }
             });
+        }
+
+        if (positionProperty.isNotNull().get()) {
+            personalPositionLayer.updatePosition(positionProperty.get().getLatitude(),
+                    positionProperty.get().getLongitude());
+            if (model.trackingEnabledProperty().get()) {
+                communicator.updateLocation(positionProperty.get().getLatitude(),
+                        positionProperty.get().getLongitude());
+            }
         }
 
         getLocationsTimeline.play();
