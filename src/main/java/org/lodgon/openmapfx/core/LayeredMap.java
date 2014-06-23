@@ -41,7 +41,7 @@ import javafx.scene.layout.Region;
  * @author johan
  */
 public class LayeredMap extends Region {
-    
+
     private BaseMap mapArea;
     private double x0,y0;
     private final ObservableList<MapLayer> layers = FXCollections.observableArrayList();
@@ -79,13 +79,10 @@ public class LayeredMap extends Region {
             x0 = t.getSceneX();
             y0 = t.getSceneY();
         });
-        setOnZoom(t ->  {
-            System.out.println("zoomfactor = "+t.getZoomFactor()+" tot = "+t.getTotalZoomFactor());
-            mapArea.zoom(t.getZoomFactor()> 1? .1: -.1, t.getSceneX(),t.getSceneY());
-        } );
-        setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()) );
+        setOnZoom(t -> mapArea.zoom(t.getZoomFactor()> 1? .1: -.1, (x0 + t.getSceneX()) / 2.0, (y0 + t.getSceneY()) / 2.0));
+        setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()));
     }
-    
+
     public void setBaseMapProvider(BaseMapProvider provider) {
         this.provider.set(provider);
         resetBaseMap();
