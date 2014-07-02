@@ -50,7 +50,7 @@ public class MapTile extends Region {
     private final MapArea mapArea;
     private final int myZoom;
     private final long i, j;
-    private boolean debug = true;
+    private boolean debug = false;
     private final List<MapTile> covering = new LinkedList<>();
 
 
