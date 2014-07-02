@@ -43,7 +43,6 @@ public class OSMTileProvider implements TileProvider {
     private static final List<TileType> tileTypes = new LinkedList<>();
     static {
         tileTypes.add(new TileType("Map", "http://tile.openstreetmap.org/", "© OpenStreetMap contributors"));
-      //  tileTypes.add(new TileType("OfflineMap", "file:/tmp/osm/", "© OpenStreetMap contributors"));
     }
     
     public OSMTileProvider() {
