@@ -83,6 +83,9 @@ println ('I will copy resources');
     }
     apply plugin: 'application'
     mainClassName = "org.lodgon.openmapfx.desktop.MapView"
+    run {
+        systemProperties System.getProperties()
+    }
 }
 
 project (':android') {
