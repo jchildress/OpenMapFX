@@ -84,7 +84,7 @@ public class MapTile extends Region {
         getTransforms().add(scale);
         //String url = TILESERVER + zoom + "/" + i + "/" + j + ".png";
         String url = mapArea.tileTypeProperty().get().getBaseURL() + zoom + "/" + i + "/" + j + ".png";
-        if (debug) System.out.println("Creating maptile " + this);
+        if (debug) System.out.println("Creating maptile " + this+" with url = "+url);
         image = new Image(url, true);
         loading.bind(image.progressProperty().lessThan(1.));
         ImageView iv = new ImageView(image);

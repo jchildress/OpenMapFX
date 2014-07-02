@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.lodgon.openmapfx.providers.FileProvider;
 import org.lodgon.openmapfx.providers.MapQuestTileProvider;
 import org.lodgon.openmapfx.providers.OSMTileProvider;
 import org.lodgon.openmapfx.providers.StamenTileProvider;
@@ -49,6 +50,10 @@ public class DefaultBaseMapProvider implements BaseMapProvider {
         tileProviders.add(new OSMTileProvider());
         tileProviders.add(new MapQuestTileProvider());
 	tileProviders.add(new StamenTileProvider());
+        if (System.getProperty("fileProvider")!= null) {
+            FileProvider fp = new FileProvider("OSM local", System.getProperty("fileProvider"));
+            tileProviders.add(fp);           
+        }
     }
     
     private final ObjectProperty<TileProvider> tileProvider = new SimpleObjectProperty<>();
