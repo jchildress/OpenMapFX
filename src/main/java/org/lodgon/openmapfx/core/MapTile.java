@@ -29,11 +29,12 @@ package org.lodgon.openmapfx.core;
 import static java.lang.Math.floor;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
@@ -50,9 +51,12 @@ public class MapTile extends Region {
     private final MapArea mapArea;
     private final int myZoom;
     private final long i, j;
-    private boolean debug = false;
     private final List<MapTile> covering = new LinkedList<>();
 
+    private boolean debug = false;
+
+    private Label debugLabel = new Label();
+    static AtomicInteger createcnt = new AtomicInteger(0);
 
     /**
      * In most cases, a tile will be shown scaled. The value for the scale
@@ -61,6 +65,7 @@ public class MapTile extends Region {
     final Scale scale = new Scale();
 
     private final InvalidationListener zl;
+    private final InvalidationListener ipl;
     private final BooleanProperty loading = new SimpleBooleanProperty();
     private final MapTile parentTile;
     private final Image image;
@@ -75,6 +80,8 @@ public class MapTile extends Region {
      * @param j the y-index (between 0 and 2^zoom)
      */
     public MapTile(final MapArea mapArea, final int zoom, final long i, final long j) {
+        int ig = createcnt.incrementAndGet();
+        if (debug) System.out.println("Create tile #" + ig);
         this.mapArea = mapArea;
         this.myZoom = zoom;
         this.i = i;
@@ -84,21 +91,31 @@ public class MapTile extends Region {
         getTransforms().add(scale);
         //String url = TILESERVER + zoom + "/" + i + "/" + j + ".png";
         String url = mapArea.tileTypeProperty().get().getBaseURL() + zoom + "/" + i + "/" + j + ".png";
-        if (debug) System.out.println("Creating maptile " + this+" with url = "+url);
+        if (debug) {
+            System.out.println("Creating maptile " + this + " with url = " + url);
+        }
         image = new Image(url, true);
         loading.bind(image.progressProperty().lessThan(1.));
         ImageView iv = new ImageView(image);
-        getChildren().addAll(iv);
-        
+        if (debug) debugLabel.setText("[" + zoom + "-" + i + "-" + j + "]");
+        getChildren().addAll(iv, debugLabel);
+
         parentTile = mapArea.findCovering(zoom, i, j);
         if (parentTile != null) {
+            if (debug) System.out.println("[JVDBG] ASK " + parentTile + " to cover for " + this);
+
             parentTile.addCovering(this);
         }
-        InvalidationListener ipl = createImageProgressListener();
+
+        ipl = createImageProgressListener();
         image.progressProperty().addListener(new WeakInvalidationListener(ipl));
-        
+        if (image.getProgress() >= 1) {
+            if (debug) System.out.println("[JVDBG] ASK " + parentTile + " to NOWFORGET for " + this);
+
+            parentTile.removeCovering(this);
+        }
         zl = recalculate();
-        
+
         mapArea.zoomProperty().addListener(new WeakInvalidationListener(zl));
         mapArea.translateXProperty().addListener(new WeakInvalidationListener(zl));
         mapArea.translateYProperty().addListener(new WeakInvalidationListener(zl));
@@ -106,14 +123,15 @@ public class MapTile extends Region {
     }
 
     /**
-     * Return the zoomLevel of this tile. This can not be changed, it is a 
-     * fixed property of the tile.
+     * Return the zoomLevel of this tile. This can not be changed, it is a fixed
+     * property of the tile.
+     *
      * @return the zoomLevel of this tile.
      */
-    public int getZoomLevel () {
+    public int getZoomLevel() {
         return myZoom;
     }
-    
+
     /**
      * Check if the image in this tile is still loading
      *
@@ -125,8 +143,9 @@ public class MapTile extends Region {
     }
 
     /**
-     * Indicate that we are used to cover the loading tile.
-     * As soon as we are covering for at least 1 tile, we are visible.
+     * Indicate that we are used to cover the loading tile. As soon as we are
+     * covering for at least 1 tile, we are visible.
+     *
      * @param me a (new) tile which image is still loading
      */
     public void addCovering(MapTile me) {
@@ -135,22 +154,25 @@ public class MapTile extends Region {
     }
 
     /**
-     * Remove the supplied tile from the covering list, as its image has been loaded.
-     * @param me 
+     * Remove the supplied tile from the covering list, as its image has been
+     * loaded.
+     *
+     * @param me
      */
     public void removeCovering(MapTile me) {
         covering.remove(me);
         calculatePosition();
     }
-    
+
     /**
      * Return the tile that will cover us while loading
+     *
      * @return the lower-level zoom tile that covers this tile.
      */
     public MapTile getCoveringTile() {
         return parentTile;
     }
-    
+
     /**
      * Check if the current tile is covering more detailed tiles that are
      * currently being loaded.
@@ -158,9 +180,9 @@ public class MapTile extends Region {
      * @return
      */
     public boolean isCovering() {
-        return covering.size()>0;
+        return covering.size() > 0;
     }
-    
+
     @Override
     public String toString() {
         return "Tile[" + myZoom + "]" + " " + i + ", " + j;
@@ -172,8 +194,12 @@ public class MapTile extends Region {
 
     private InvalidationListener createImageProgressListener() {
         InvalidationListener answer = o -> {
-            if (image.getProgress() >= 1.) {
+            double progress = image.getProgress();
+//            System.out.println("IPL, p = "+progress+" for "+this);
+            if (progress >= 1.) {
                 if (parentTile != null) {
+                    if (debug) System.out.println("[JVDBG] ASK " + parentTile + " to FORGET cover for " + this);
+
                     parentTile.removeCovering(MapTile.this);
                 }
             }
@@ -186,11 +212,15 @@ public class MapTile extends Region {
         int visibleWindow = (int) floor(currentZoom + MapArea.TIPPING);
         if ((visibleWindow == myZoom) || isCovering() || ((visibleWindow >= MapArea.MAX_ZOOM) && (myZoom == MapArea.MAX_ZOOM - 1))) {
             this.setVisible(true);
+
         } else {
             this.setVisible(false);
         }
         if (debug) {
-            System.out.println("visible tile " + this + "? " + this.isVisible());
+            System.out.println("visible tile " + this + "? " + this.isVisible() + (this.isVisible() ? " covering? " + isCovering() : ""));
+            if (this.isVisible() && this.isCovering()) {
+                System.out.println("covering for " + this.covering);
+            }
         }
         double sf = Math.pow(2, currentZoom - myZoom);
         scale.setX(sf);
@@ -198,5 +228,5 @@ public class MapTile extends Region {
         setTranslateX(256 * i * sf);
         setTranslateY(256 * j * sf);
     }
-    
+
 }
