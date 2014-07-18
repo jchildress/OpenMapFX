@@ -7,6 +7,8 @@ allprojects {
     }
 }
 apply plugin: 'application'
+apply plugin: 'signing'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = '1.8'
 mainClassName = "org.lodgon.openmapfx.desktop.MapView"
@@ -32,6 +34,35 @@ repositories {
 
 dependencies {
        testCompile group: 'junit', name: 'junit', version: '4.10'
+}
+
+task coreJar(type:Jar) {
+}
+
+artifacts {
+    archives coreJar
+}
+
+task signJars(type: Sign, dependsOn: jar) {
+    sign configurations.archives
+}
+
+task upload << {
+    signJars
+}
+publishing {
+    publications {
+        core(MavenPublication) {
+            groupId 'org.lodgon.openmapfx'
+            artifactId 'openmapfx-core'
+            version '1.0'
+
+            artifact jar
+        }
+    }
+    repositories {
+        mavenCentral()
+    }
 }
 
 /******************************************************************************
