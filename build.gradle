@@ -56,32 +56,28 @@ task sourceJar(type: Jar) {
   classifier "source"
 }
 
-pompart = new File('pompart.xml').text
-
 publishing {
     publications {
         core(MavenPublication) {
             groupId 'org.lodgon.openmapfx'
             artifactId 'openmapfx-core'
             version '1.0'
-
-/*
-pom.project {
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
+            pom.withXml {
+                asNode().appendNode('name', 'OpenMapFX Core')
+                asNode().appendNode('description', 'The OpenMapFX Core functionality')
+                asNode().appendNode('url', 'http://bitbucket.org/lodgon/openmapfx')
+                def license = asNode().appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'The 3-Clause BSD License')
+                license.appendNode('url', 'http://opensource.org/licenses/BSD-3-Clause')
+                license.appendNode('distribution', 'repo')
+                def developer = asNode().appendNode('developers').appendNode('developer')
+                developer.appendNode('id', 'johanvos')
+                developer.appendNode('name', 'Johan Vos')
+                def scm = asNode().appendNode('scm')
+                scm.appendNode('connection', 'scm:hg:https://bitbucket.org/lodgon/openmapfx')
+                scm.appendNode('developerConnection', 'scm:hg:https://bitbucket.org/lodgon/openmapfx')
+                scm.appendNode('url', 'https://bitbucket.org/lodgon/openmapfx/overview')
             }
-*/
-            //pom.withXml {
-            //    asNode().appendNode('name', 'OpenMapFX Core')
-              //  asNode().appendNode('description', 'The OpenMapFX Core functionality')
-             //   asNode().appendNode('url', 'http://bitbucket.org/lodgon/openmapfx')
-                //asString().append(pompart)
-         //   }
             artifact sourceJar
             artifact jar {
                 classifier "jar"
@@ -98,56 +94,10 @@ pom.project {
         }
     }
 }
-/*
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
- 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-              authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
- 
-            pom.project {
-               name 'GradleFx'
-               packaging 'jar'
-               description 'GradleFx is a Gradle plugin for building Flex and Actionscript applications'
-               url 'http://gradlefx.github.com/'
- 
-               scm {
-                   url 'scm:git@github.com:GradleFx/GradleFx.git'
-                   connection 'scm:git@github.com:GradleFx/GradleFx.git'
-                   developerConnection 'scm:git@github.com:GradleFx/GradleFx.git'
-               }
- 
-               licenses {
-                   license {
-                       name 'The Apache Software License, Version 2.0'
-                       url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                       distribution 'repo'
-                   }
-               }
- 
-               developers {
-                   developer {
-                       id 'johanvos'
-                       name 'Johan Vos'
-                   }
-                   developer {
-                       id 'stevendick'
-                       name 'Steven Dick'
-                   }
-               }
-           }
-        }
-    }
-}
-*/
 
 /******************************************************************************
  * Project specific configurations                                            *
  *****************************************************************************/
-
 
 project (':leapmotion') {
     compileJava.onlyIf{project.hasProperty('LEAPSDK')}
