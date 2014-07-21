@@ -56,6 +56,8 @@ task sourceJar(type: Jar) {
   classifier "source"
 }
 
+pompart = new File('pompart.xml').text
+
 publishing {
     publications {
         core(MavenPublication) {
@@ -63,11 +65,23 @@ publishing {
             artifactId 'openmapfx-core'
             version '1.0'
 
-            pom.withXml {
-                asNode().appendNode('name', 'OpenMapFX Core')
-                asNode().appendNode('description', 'The OpenMapFX Core functionality')
-                asNode().appendNode('url', 'http://bitbucket.org/lodgon/openmapfx')
+/*
+pom.project {
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
             }
+*/
+            //pom.withXml {
+            //    asNode().appendNode('name', 'OpenMapFX Core')
+              //  asNode().appendNode('description', 'The OpenMapFX Core functionality')
+             //   asNode().appendNode('url', 'http://bitbucket.org/lodgon/openmapfx')
+                //asString().append(pompart)
+         //   }
             artifact sourceJar
             artifact jar {
                 classifier "jar"
