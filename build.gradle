@@ -1,3 +1,5 @@
+// maven upload taken from the ControlsFX gradle build files
+// see http://controlsfx.org
 allprojects {
     apply plugin: 'java'
     apply plugin: 'retrolambda'
@@ -7,8 +9,13 @@ allprojects {
     }
 }
 apply plugin: 'application'
-apply plugin: 'signing'
-apply plugin: 'maven-publish'
+// apply plugin: 'signing'
+// apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply from: 'mavenPublish.gradle'
+
+group = 'org.lodgon.openmapfx'
+version = '1.0.0'
 
 sourceCompatibility = '1.8'
 mainClassName = "org.lodgon.openmapfx.desktop.MapView"
@@ -36,68 +43,50 @@ dependencies {
        testCompile group: 'junit', name: 'junit', version: '4.10'
 }
 
-task coreJar(type:Jar) {
+javadoc {
+    exclude 'impl/*'
+    failOnError = true
+    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
+
+    options.windowTitle("ControlsFX Project ${version}")
+    options.links("http://docs.oracle.com/javase/8/docs/api/");
+    options.links("http://docs.oracle.com/javase/8/javafx/api/");
+    options.addBooleanOption("Xdoclint:none").setValue(true);
+    options.overview("src/main/docs/overview.html");
+
+    doLast {
+        copy {
+            from "src/main/docs"
+            into "$buildDir/docs/javadoc"
+        }
+    }
+}
+
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    classifier = 'javadoc'
 }
 
 artifacts {
-    archives coreJar
+    archives sourceJar
+    archives javadocJar
 }
 
-task signJars(type: Sign, dependsOn: jar) {
-    sign configurations.archives
-}
 
-task upload << {
-    signJars
-}
 
-task sourceJar(type: Jar) {
-  from sourceSets.main.allJava
-  classifier "source"
-}
-
-publishing {
-    publications {
-        core(MavenPublication) {
-            groupId 'org.lodgon.openmapfx'
-            artifactId 'openmapfx-core'
-            version '1.0'
-            pom.withXml {
-                asNode().appendNode('name', 'OpenMapFX Core')
-                asNode().appendNode('description', 'The OpenMapFX Core functionality')
-                asNode().appendNode('url', 'http://bitbucket.org/lodgon/openmapfx')
-                def license = asNode().appendNode('licenses').appendNode('license')
-                license.appendNode('name', 'The 3-Clause BSD License')
-                license.appendNode('url', 'http://opensource.org/licenses/BSD-3-Clause')
-                license.appendNode('distribution', 'repo')
-                def developer = asNode().appendNode('developers').appendNode('developer')
-                developer.appendNode('id', 'johanvos')
-                developer.appendNode('name', 'Johan Vos')
-                def scm = asNode().appendNode('scm')
-                scm.appendNode('connection', 'scm:hg:https://bitbucket.org/lodgon/openmapfx')
-                scm.appendNode('developerConnection', 'scm:hg:https://bitbucket.org/lodgon/openmapfx')
-                scm.appendNode('url', 'https://bitbucket.org/lodgon/openmapfx/overview')
-            }
-            artifact sourceJar
-            artifact jar {
-                classifier "jar"
-            }
-        }
-    }
-    repositories {
-        maven {
-            url= "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username nexusUsername
-                password nexusPassword
-            }
-        }
-    }
-}
 
 /******************************************************************************
  * Project specific configurations                                            *
  *****************************************************************************/
+
 
 project (':leapmotion') {
     compileJava.onlyIf{project.hasProperty('LEAPSDK')}
