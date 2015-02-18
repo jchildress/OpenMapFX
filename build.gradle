@@ -27,11 +27,12 @@ if (!hasProperty('mainClass')) {
 
 buildscript {
   repositories {
-      mavenCentral()
+      jcenter()
   }
 
   dependencies {
      classpath 'me.tatarka:gradle-retrolambda:1.3.0'
+     classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
   }
 }
 
@@ -80,7 +81,9 @@ artifacts {
     archives javadocJar
 }
 
-
+allprojects {
+    apply from: rootProject.file('gradle/code-quality.gradle')
+}
 
 
 /******************************************************************************
