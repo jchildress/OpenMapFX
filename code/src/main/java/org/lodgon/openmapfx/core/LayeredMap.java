@@ -191,4 +191,9 @@ public class LayeredMap extends Region {
     public DoubleProperty centerLatitudeProperty() {
         return this.mapArea.centerLat();
     }
+    
+    public void addNode(Node n) {
+        this.getChildren().add(n);
+    }
+
 }
