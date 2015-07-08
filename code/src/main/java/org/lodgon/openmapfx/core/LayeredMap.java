@@ -80,7 +80,7 @@ public class LayeredMap extends Region {
             y0 = t.getSceneY();
         });
         setOnZoom(t -> mapArea.zoom(t.getZoomFactor() > 1 ? .1 : -.1, (x0 + t.getSceneX()) / 2.0, (y0 + t.getSceneY()) / 2.0));
-        boolean zoomGestureEnabled = Boolean.valueOf(System.getProperty("com.sun.javafx.gestures.zoom", "true"));
+        boolean zoomGestureEnabled = Boolean.valueOf(System.getProperty("com.sun.javafx.gestures.zoom", "false"));
         if (!zoomGestureEnabled) {
             setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()));
         }
