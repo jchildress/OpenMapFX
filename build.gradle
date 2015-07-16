@@ -87,4 +87,13 @@ allprojects {
     apply plugin: 'com.github.ben-manes.versions'
 }
 
+project(":desktop") {
+    dependencies {
+        compile project(':code')
+    }
+    apply plugin: 'application'
+    mainClassName = 'org.lodgon.openmapfx.desktop.MapView'
+}
+
+
 

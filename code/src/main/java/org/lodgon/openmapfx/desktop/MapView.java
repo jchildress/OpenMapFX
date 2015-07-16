@@ -79,6 +79,8 @@ public class MapView extends Application {
         stage.setScene(scene);
         stage.show();
         map.setZoom(4);
+        map.setViewport(52.0,4.9,50.1,4.0);
+
         map.setCenter(50.2, 4.2);
         showMyLocation();
 
@@ -87,7 +89,7 @@ public class MapView extends Application {
     }
 
     private void showMyLocation() {
-        URL im = this.getClass().getResource("../icons/mylocation.png");
+        URL im = this.getClass().getResource("/org/lodgon/openmapfx/icons/mylocation.png");
         Image image = new Image(im.toString());
         PositionLayer positionLayer = new PositionLayer(image);
         map.getLayers().add(positionLayer);
