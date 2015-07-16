@@ -1,3 +1,3 @@
 rootProject.name = 'OpenMapFX'
-include 'code'
+include 'code', 'desktop'
 // include 'leapmotion', 'android', 'miataru', 'desktop'

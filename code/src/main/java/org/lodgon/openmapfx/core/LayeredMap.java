@@ -34,6 +34,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 
 /**
@@ -132,6 +133,32 @@ public class LayeredMap extends Region {
      */
     public void setCenter (double lat, double lon) {
         this.mapArea.setCenter(lat, lon);
+    }
+    
+    /**
+     * Explicitly show the rectangular viewport on the map. The center of the viewport will
+     * be the center of the map. The map is scaled as big as possible,
+     * ensuring though that the viewport is visible.
+     * Viewport is provided by the north-east and south-west corners.
+     * @param lat1 latitude north-east
+     * @param lon1 longitude north-east
+     * @param lat2 latitude south-west
+     * @param lon2 longitude south-west
+     */
+    public void setViewport(double lat1, double lon1, double lat2, double lon2) {
+        double latdiff = lat1 - lat2;
+        double londiff = lon1 - lon2;
+        double log2 = Math.log(2.);
+        Scene scene = this.mapArea.getView().getScene();
+        double tileX = scene.getWidth() / 256;
+        double tileY = scene.getHeight() / 256;
+        double latzoom = Math.log(180 * tileY / latdiff) / log2;
+        double lonzoom = Math.log(360 * tileX / londiff) / log2;
+        double centerX = lat2 + latdiff / 2;
+        double centerY = lon2 + londiff / 2;
+
+        this.mapArea.setZoom(Math.min(latzoom, lonzoom));
+        this.mapArea.setCenter(centerX, centerY);
     }
     
     /**

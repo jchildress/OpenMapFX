@@ -48,7 +48,6 @@ import org.lodgon.openmapfx.core.LicenceLayer;
 import org.lodgon.openmapfx.core.TileProvider;
 import org.lodgon.openmapfx.service.MapViewPane;
 import org.lodgon.openmapfx.service.OpenMapFXService;
-import org.lodgon.openmapfx.service.miataru.MiataruService;
 
 public class MapView extends Application {
 
@@ -71,6 +70,7 @@ public class MapView extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        System.out.println("HELLO WORLD");
         DefaultBaseMapProvider provider = new DefaultBaseMapProvider();
 
         spp = new SimpleProviderPicker(provider);
@@ -103,7 +103,8 @@ public class MapView extends Application {
         stage.setScene(scene);
         stage.show();
         map.setZoom(4);
-        map.setCenter(50.2, 4.2);
+        map.setViewport(50.2,4.2,50.1,4.0);
+  //      map.setCenter(50.2, 4.2);
         //    showMyLocation();
 
         licenceLayer = new LicenceLayer(provider);
@@ -141,9 +142,8 @@ public class MapView extends Application {
                 }
 
             };
-            MiataruService miataru = new MiataruService();
             services = FXCollections.observableArrayList();
-            services.addAll(nothing, miataru);
+            services.addAll(nothing);
         }
         return services;
     }
