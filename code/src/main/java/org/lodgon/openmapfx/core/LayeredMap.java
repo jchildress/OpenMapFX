@@ -206,6 +206,17 @@ public class LayeredMap extends Region {
     }
     
     /**
+     * Return the geolocation (lat/lon) for a given point on the screen
+     * 
+     * @param sceneX
+     * @param sceneY
+     * @return 
+     */
+    public Position getMapPosition(double sceneX, double sceneY) {
+       return this.mapArea.getMapPosition(sceneX, sceneY);
+    }
+    
+    /**
      * Return the zoom property for the backing map
      * @return the zoom property for the backing map
      */

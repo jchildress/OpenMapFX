@@ -28,6 +28,7 @@ package org.lodgon.openmapfx.desktop;
 
 import java.net.URL;
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -36,6 +37,7 @@ import javafx.stage.Stage;
 import org.lodgon.openmapfx.core.DefaultBaseMapProvider;
 import org.lodgon.openmapfx.core.LayeredMap;
 import org.lodgon.openmapfx.core.LicenceLayer;
+import org.lodgon.openmapfx.core.Position;
 import org.lodgon.openmapfx.core.PositionLayer;
 import org.lodgon.openmapfx.core.TileProvider;
 
@@ -80,13 +82,14 @@ public class MapView extends Application {
         stage.show();
      //   map.setZoom(4);
         map.setViewport(52.0,4.9,50.1,4.0);
-
       //  map.setCenter(50.2, 4.2);
         showMyLocation();
         map.setZoom(10);
 
         licenceLayer = new LicenceLayer(provider);
         map.getLayers().add(licenceLayer);
+        Position p = map.getMapArea().getMapPosition(10,100);
+        System.out.println ("position = "+p.getLatitude()+", "+p.getLongitude());
     }
 
     private void showMyLocation() {

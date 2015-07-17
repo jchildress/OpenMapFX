@@ -259,6 +259,16 @@ public class MapArea extends Group implements BaseMap {
         return answer;
     }
     
+    public Position getMapPosition(double sceneX, double sceneY) {
+        double x = sceneX-this.getTranslateX();
+        double y = sceneY-this.getTranslateY();
+        double zoom =zoomProperty().get();
+        double latrad = Math.PI - (2.0 * Math.PI * y) / (Math.pow(2, zoom)*256.);
+        double mlat = Math.toDegrees(Math.atan(Math.sinh(latrad)));
+        double mlon = x / (256*Math.pow(2, zoom)) * 360 - 180;
+        return new Position(mlat, mlon);
+    }
+    
     private void calculateCenterCoords() {
         double x = this.getScene().getWidth()/2-this.getTranslateX();
         double y = this.getScene().getHeight()/2 - this.getTranslateY();
