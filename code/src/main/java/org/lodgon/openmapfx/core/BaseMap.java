@@ -85,6 +85,15 @@ public interface BaseMap {
      */
     public Point2D getMapPoint (double lat, double lon);
     
+    /**
+     * Return the geolocation (lat/lon) for a given point on the screen
+     * 
+     * @param sceneX
+     * @param sceneY
+     * @return 
+     */
+    public Position getMapPosition(double sceneX, double sceneY);
+     
     /** The current center longitude.
      * 
      * @return 
