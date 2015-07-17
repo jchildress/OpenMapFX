@@ -124,9 +124,10 @@ public class LayeredMap extends Region {
      * @param z the zoom level
      */
     public void setZoom (double z) {
-        double delta =  z - this.mapArea.zoomProperty().get() ;
         Scene s = this.getScene();
-        this.mapArea.zoom(delta, s.getWidth()/2, s.getHeight()/2);
+        double x = (s == null)? 0 : s.getWidth()/2;
+        double y = (s == null)? 0 : s.getWidth()/2;
+        setZoom(z, x, y);
     }
     
    /**
