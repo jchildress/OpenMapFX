@@ -193,7 +193,7 @@ public class MapArea extends Group implements BaseMap {
     }
 
     public void zoom(double delta, double pivotX, double pivotY) {
-        double dz = delta > 0 ? .1 : -.1;
+        double dz = delta;// > 0 ? .1 : -.1;
         double zp = zoomProperty.get();
         if (debug) {
             System.out.println("Zoom called, zp = " + zp + ", delta = " + delta + ", px = " + pivotX + ", py = " + pivotY);
@@ -213,17 +213,17 @@ public class MapArea extends Group implements BaseMap {
             if (zp < MAX_ZOOM) {
                 setTranslateX(txold + totX);
                 setTranslateY(tyold + totY);
-                zoomProperty.set(zp + .1);
+                zoomProperty.set(zp + delta);
                 loadTiles();
             }
         } else {
             if (zp > 1) {
-                double nz = zp - .1;
+                double nz = zp +delta;
                 if (Math.pow(2, nz) * 256 > this.getScene().getHeight()) {
                     // also, we need to fit on the current screen
                     setTranslateX(txold + totX);
                     setTranslateY(tyold + totY);
-                    zoomProperty.set(zp - .1);
+                    zoomProperty.set(zp +delta);
                     loadTiles();
                 } else {
                     System.out.println("sorry, would be too small");

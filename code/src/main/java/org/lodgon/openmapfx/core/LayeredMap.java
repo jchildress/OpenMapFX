@@ -83,7 +83,7 @@ public class LayeredMap extends Region {
         setOnZoom(t -> mapArea.zoom(t.getZoomFactor() > 1 ? .1 : -.1, (x0 + t.getSceneX()) / 2.0, (y0 + t.getSceneY()) / 2.0));
         boolean zoomGestureEnabled = Boolean.valueOf(System.getProperty("com.sun.javafx.gestures.zoom", "false"));
         if (!zoomGestureEnabled) {
-            setOnScroll(t -> mapArea.zoom(t.getDeltaY(), t.getSceneX(), t.getSceneY()));
+            setOnScroll(t -> mapArea.zoom(t.getDeltaY() > 1? .1: -.1, t.getSceneX(), t.getSceneY()));
         }
     }
 
@@ -119,11 +119,26 @@ public class LayeredMap extends Region {
     }
     
     /**
-     * Explicitly set the zoom level for this map.
+     * Explicitly set the zoom level for this map. The map will be zoomed
+     * with the center of the map as pivot
      * @param z the zoom level
      */
     public void setZoom (double z) {
-        this.mapArea.setZoom(z);
+        double delta =  z - this.mapArea.zoomProperty().get() ;
+        Scene s = this.getScene();
+        this.mapArea.zoom(delta, s.getWidth()/2, s.getHeight()/2);
+    }
+    
+   /**
+     * Explicitly set the zoom level for this map. The map will be zoomed
+     * around the supplied x-y coordinates 
+     * @param z the zoom level
+     * @param x the pivot point, in pixels from the origin of the map
+     * @param y the pivot point, in pixels from the origin of the map
+     */
+    public void setZoom (double z, double x, double y) {
+        double delta =  z - this.mapArea.zoomProperty().get() ;
+        this.mapArea.zoom(delta, x,y);
     }
     
     /**
