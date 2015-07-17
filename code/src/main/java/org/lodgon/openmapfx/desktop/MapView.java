@@ -78,11 +78,12 @@ public class MapView extends Application {
         Scene scene = new Scene(bp, 800, 650);
         stage.setScene(scene);
         stage.show();
-        map.setZoom(4);
+     //   map.setZoom(4);
         map.setViewport(52.0,4.9,50.1,4.0);
 
-        map.setCenter(50.2, 4.2);
+      //  map.setCenter(50.2, 4.2);
         showMyLocation();
+        map.setZoom(10);
 
         licenceLayer = new LicenceLayer(provider);
         map.getLayers().add(licenceLayer);
