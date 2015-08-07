@@ -15,7 +15,7 @@ apply plugin: 'maven'
 apply from: 'mavenPublish.gradle'
 
 group = 'org.lodgon.openmapfx'
-version = '1.0.0'
+version = '1.0.1'
 
 sourceCompatibility = '1.8'
 mainClassName = "org.lodgon.openmapfx.desktop.MapView"
