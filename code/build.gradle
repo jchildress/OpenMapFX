@@ -18,5 +18,23 @@ apply plugin: 'maven'
 apply from: 'mavenPublish.gradle'
 
 group = 'org.lodgon.openmapfx'
-version = '1.0.1-SNAPSHOT'
+version = '1.0'
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+artifacts {
+    archives sourceJar
+    archives javadocJar
+}
+
 
