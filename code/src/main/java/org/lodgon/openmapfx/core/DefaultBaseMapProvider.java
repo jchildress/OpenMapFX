@@ -64,6 +64,11 @@ public class DefaultBaseMapProvider implements BaseMapProvider {
         selectedTileType.set(tileProvider.get().getDefaultType());
     }
     
+    public DefaultBaseMapProvider (TileProvider tp) {
+        tileProvider.set(tp);
+        selectedTileType.set(tp.getDefaultType());
+    }
+    
     @Override
     public String getMapName() {
         return mapName;

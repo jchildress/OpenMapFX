@@ -26,6 +26,8 @@
  */
 package org.lodgon.openmapfx.core;
 
+import java.io.File;
+
 /** Describes a type of tile that can be returned from a {@link TileProvider}, 
  * for example, map, terrain or satellite. The base address is set here to be 
  * able to cope with potential variations to supply methods.
@@ -37,11 +39,10 @@ public class TileType implements MapTileType {
     private final String typeName;
     private final String baseURL;
     private final String attributionNotice;
+    private String fileStorageBase = null;
     
     public TileType(String typeName, String baseURL) {
-        this.typeName = typeName;
-        this.baseURL = baseURL;
-        this.attributionNotice = "";
+        this(typeName, baseURL,"");
     }
     
     public TileType(String typeName, String baseURL, String attributionNotice) {
@@ -50,11 +51,15 @@ public class TileType implements MapTileType {
         this.attributionNotice = attributionNotice;
     }
     
+    public void setFileStorageBase(String store) {
+        this.fileStorageBase = store;
+    }
+    
     /** The display name for this type of tile, for use in the user interface.
      * 
      * @return 
      */
-	@Override
+    @Override
     public String getTypeName() {
         return typeName;
     }
@@ -67,6 +72,21 @@ public class TileType implements MapTileType {
 	@Override
     public String getBaseURL() {
         return baseURL;
+    }
+    
+    public String getFileCached(int zoom, long i, long j) {
+        if (fileStorageBase != null) {
+            String enc = File.separator+zoom+File.separator+i+File.separator+j+".png";
+            File candidate = new File(fileStorageBase, enc);
+            if (candidate.exists()) {
+                return "file://"+candidate.getAbsolutePath();
+            } 
+        }
+        return null;
+    }
+    @Override
+    public String getFullURL (int zoom, long i, long j) {
+        return getBaseURL() + zoom + "/" + i + "/" + j + ".png";
     }
     
 	@Override

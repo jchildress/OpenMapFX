@@ -52,5 +52,9 @@ public interface MapTileType {
      * @return 
      */
     public String getAttributionNotice();
-	
+    
+    public String getFullURL(int zoom, long x, long y);
+    
+    public String getFileCached(int zoom, long i, long j);
+
 }

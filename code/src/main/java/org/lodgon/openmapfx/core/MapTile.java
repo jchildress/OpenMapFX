@@ -90,7 +90,7 @@ public class MapTile extends Region {
         scale.setPivotY(0);
         getTransforms().add(scale);
         //String url = TILESERVER + zoom + "/" + i + "/" + j + ".png";
-        String url = mapArea.tileTypeProperty().get().getBaseURL() + zoom + "/" + i + "/" + j + ".png";
+        String url = mapArea.tileTypeProperty().get().getFullURL(zoom, i, j);// , ig, ig).getBaseURL() + zoom + "/" + i + "/" + j + ".png";
         if (debug) {
             System.out.println("Creating maptile " + this + " with url = " + url);
         }
