@@ -1,0 +1,22 @@
+buildscript {
+  repositories {
+     mavenCentral()
+  }
+
+  dependencies {
+     classpath 'me.tatarka:gradle-retrolambda:3.0.0'
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'maven'
+apply from: 'mavenPublish.gradle'
+
+group = 'org.lodgon.openmapfx'
+version = '1.0.2-SNAPSHOT'
+

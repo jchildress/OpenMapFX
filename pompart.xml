@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+  <groupId>org.lodgon.openmapfx</groupId>
+  <artifactId>openmapfx-core</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <name>OpenMapFX Core</name>
+  <url>http://bitbucket.org/lodgon/openmapfx</url>
+  <description>The OpenMapFX Core functionality</description>
+  <licenses>
+      <license>
+          <name>The 3-Clause BSD License</name>
+          <url>http://opensource.org/licenses/BSD-3-Clause</url>
+          <distribution>repo</distribution>
+      </license>
+  </licenses>
+    <developers>
+        <developer>
+            <name>Johan Vos</name>
+        </developer>
+    <developers>
+    <scm>
+        <connection>scm:hg:https://bitbucket.org/lodgon/openmapfx</connection>
+        <developerConnection>scm:hg:https://bitbucket.org/lodgon/openmapfx</developerConnection>
+        <url>https://bitbucket.org/lodgon/openmapfx/overview</url>
+    </scm>
+</project>
+

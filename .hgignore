@@ -1,0 +1,19 @@
+syntax: glob
+*.class
+*.iml
+.DS_Store
+.idea/*
+.gradle/*
+.nb-gradle/*
+bin/*
+.settings/*
+build/*
+.classpath
+*.project
+*.launch
+local.properties
+derby.log
+target/databases/*
+.sass-cache/**
+.gems/*
+hg-checkexec-*

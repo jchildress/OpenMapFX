@@ -1,0 +1,99 @@
+// maven upload taken from the ControlsFX gradle build files
+// see http://controlsfx.org
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'retrolambda'
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
+apply plugin: 'application'
+// apply plugin: 'signing'
+// apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply from: 'mavenPublish.gradle'
+
+group = 'org.lodgon.openmapfx'
+version = '1.0.0'
+
+sourceCompatibility = '1.8'
+mainClassName = "org.lodgon.openmapfx.desktop.MapView"
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'org.lodgon.openmapfx.desktop.MapView'
+}
+
+buildscript {
+  repositories {
+      jcenter()
+  }
+
+  dependencies {
+     classpath 'me.tatarka:gradle-retrolambda:1.3.0'
+     classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+     classpath 'com.github.ben-manes:gradle-versions-plugin:0.8'
+  }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+       testCompile group: 'junit', name: 'junit', version: '4.10'
+}
+
+javadoc {
+    exclude 'impl/*'
+    failOnError = true
+    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
+
+    options.windowTitle("ControlsFX Project ${version}")
+    options.links("http://docs.oracle.com/javase/8/docs/api/");
+    options.links("http://docs.oracle.com/javase/8/javafx/api/");
+    options.addBooleanOption("Xdoclint:none").setValue(true);
+    options.overview("src/main/docs/overview.html");
+
+    doLast {
+        copy {
+            from "src/main/docs"
+            into "$buildDir/docs/javadoc"
+        }
+    }
+}
+
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+artifacts {
+    archives sourceJar
+    archives javadocJar
+}
+
+allprojects {
+    apply from: rootProject.file('gradle/code-quality.gradle')
+    apply plugin: 'com.github.ben-manes.versions'
+}
+
+project(":desktop") {
+    dependencies {
+        compile project(':code')
+    }
+    apply plugin: 'application'
+    mainClassName = 'org.lodgon.openmapfx.desktop.MapView'
+}
+
+
+
