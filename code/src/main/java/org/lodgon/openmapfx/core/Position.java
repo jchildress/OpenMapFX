@@ -48,5 +48,8 @@ public class Position {
         return this.longitude;
     }
     
+    public String toString() {
+        return "point with lat-lon "+latitude+", "+longitude;
+    }
     
 }

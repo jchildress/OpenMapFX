@@ -189,7 +189,7 @@ public class MapArea extends Group implements BaseMap {
             System.out.println("setZoom called");
         }
         zoomProperty.set(z);
-        loadTiles();
+        setCenter(this.lat, this.lon);
     }
 
     public void zoom(double delta, double pivotX, double pivotY) {
@@ -305,7 +305,7 @@ public class MapArea extends Group implements BaseMap {
         long imax = Math.min(i_max, imin + (long) (width * Math.pow(2, deltaZ) / 256) + 3);
         long jmax = Math.min(j_max, jmin + (long) (height * Math.pow(2, deltaZ) / 256) + 3);
         if (debug) {
-            System.out.println("zoom = " + nearestZoom + ", active = " + activeZoom + ", loadtiles, check i-range: " + imin + ", " + imax + " and j-range: " + jmin + ", " + jmax);
+            System.out.println("zoom = " + nearestZoom + ", active = " + activeZoom +", tx = "+tx+ ", loadtiles, check i-range: " + imin + ", " + imax + " and j-range: " + jmin + ", " + jmax);
         }
         for (long i = imin; i < imax; i++) {
             for (long j = jmin; j < jmax; j++) {
