@@ -34,6 +34,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -96,6 +98,20 @@ public class MapTile extends Region {
         }
         image = new Image(url, true);
         loading.bind(image.progressProperty().lessThan(1.));
+        ChangeListener<Boolean> cl =  new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    System.out.println("offer");
+                    loading.removeListener(this);
+                }
+            }
+        };
+        if (!loading.get()) {
+            loading.addListener(cl);
+        }
+        
         ImageView iv = new ImageView(image);
         if (debug) debugLabel.setText("[" + zoom + "-" + i + "-" + j + "]");
         getChildren().addAll(iv, debugLabel);
