@@ -57,7 +57,7 @@ public class TileType implements MapTileType {
     
     /** The display name for this type of tile, for use in the user interface.
      * 
-     * @return 
+     * @return the name of the type
      */
     @Override
     public String getTypeName() {
