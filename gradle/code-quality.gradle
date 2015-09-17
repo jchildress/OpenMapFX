@@ -1,0 +1,18 @@
+apply plugin: 'com.github.hierynomus.license'
+
+license {
+    header = rootProject.file('gradle/HEADER')
+    strictCheck = true
+    ignoreFailures = true
+    mapping {
+        java   = 'SLASHSTAR_STYLE'
+        groovy = 'SLASHSTAR_STYLE'
+    }
+    ext.year = '2014, 2015,'
+    exclude '**/*.png'
+}
+
+licenseTest {
+    source -= sourceSets.test.resources
+}
+
