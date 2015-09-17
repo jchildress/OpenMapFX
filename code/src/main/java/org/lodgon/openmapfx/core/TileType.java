@@ -27,6 +27,7 @@
 package org.lodgon.openmapfx.core;
 
 import java.io.File;
+import javafx.scene.image.Image;
 
 /** Describes a type of tile that can be returned from a {@link TileProvider}, 
  * for example, map, terrain or satellite. The base address is set here to be 
@@ -77,6 +78,7 @@ public class TileType implements MapTileType {
     public String getFileCached(int zoom, long i, long j) {
         if (fileStorageBase != null) {
             String enc = File.separator+zoom+File.separator+i+File.separator+j+".png";
+            System.out.println("looking for "+enc+" in "+fileStorageBase);
             File candidate = new File(fileStorageBase, enc);
             if (candidate.exists()) {
                 return "file://"+candidate.getAbsolutePath();
@@ -86,10 +88,11 @@ public class TileType implements MapTileType {
     }
     @Override
     public String getFullURL (int zoom, long i, long j) {
-        return getBaseURL() + zoom + "/" + i + "/" + j + ".png";
+        String cached = getFileCached(zoom, i, j);
+        return (cached != null)? cached: getBaseURL() + zoom + "/" + i + "/" + j + ".png";
     }
     
-	@Override
+    @Override
     public String getAttributionNotice() {
         return attributionNotice;
     }
@@ -97,6 +100,20 @@ public class TileType implements MapTileType {
     @Override
     public String toString() {
         return getTypeName();
+    }
+
+    @Override
+    public void addToCache(int zoom, long i, long j, Image image) {
+  if (fileStorageBase != null) {
+            String enc = File.separator+zoom+File.separator+i+File.separator+j+".png";
+            System.out.println("looking for "+enc+" in "+fileStorageBase);
+            File candidate = new File(fileStorageBase, enc);
+            if (!candidate.exists()) {
+                // we already have this
+//                image.getPixelReader().
+//                return "file://"+candidate.getAbsolutePath();
+            } 
+        }
     }
     
 }
