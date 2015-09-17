@@ -42,7 +42,7 @@ import javafx.scene.layout.Region;
  * @author johan
  */
 public class LayeredMap extends Region {
-
+final int MAXZOOM=16;
     private BaseMap mapArea;
     private double x0,y0;
     private final ObservableList<MapLayer> layers = FXCollections.observableArrayList();
@@ -172,8 +172,8 @@ public class LayeredMap extends Region {
         double lonzoom = Math.log(360 * tileX / londiff) / log2;
         double centerX = lat2 + latdiff / 2;
         double centerY = lon2 + londiff / 2;
-
-        this.mapArea.setZoom(Math.min(latzoom, lonzoom));
+        double z= Math.min(MAXZOOM, Math.min(latzoom, lonzoom));
+        this.mapArea.setZoom(z);
         this.mapArea.setCenter(centerX, centerY);
     }
     
