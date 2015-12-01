@@ -35,11 +35,7 @@ import javafx.scene.Parent;
 
 /**
  * A MultiPositionLayer is an implementation of a MapLayer with support for
-<<<<<<< local
  * tracking multiple nodes. You must call {@link #addNode(javafx.scene.Node, double, double) addNode}
-=======
- * tracking multiple nodes. You must call {@link #addNode(javafx.scene.Node, double lat, double lon) addNode}
->>>>>>> other
  * first for every node that should be tracked by this layer. Every Node is
  * uniquely identified by their {@link javafx.scene.Node#id}. If no id was set,
  * a random id will be used instead.
@@ -59,11 +55,7 @@ public class MultiPositionLayer extends Parent implements MapLayer {
 
     /**
      * Adds a node to the layer. The id of the node is used internally to
-<<<<<<< local
      * uniquely identify it later when {@link #updatePosition(javafx.scene.Node, double, double) updatePosition}
-=======
-     * uniquely identify it later when {@link #updatePosition(javafx.scene.Node, double lat, double lon) updatePosition}
->>>>>>> other
      * is called. A random unique id will be set when no id was defined for the
      * node.
      * @param node the node to add
