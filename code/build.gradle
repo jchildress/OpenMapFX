@@ -18,17 +18,7 @@ apply plugin: 'maven'
 apply from: 'mavenPublish.gradle'
 
 group = 'org.lodgon.openmapfx'
-<<<<<<< local
 version = '1.0.2'
-=======
-version = '1.0'
->>>>>>> other
-
-<<<<<<< local
-
-
-=======
->>>>>>> other
 task sourceJar(type: Jar) {
     from sourceSets.main.java
     from sourceSets.main.resources
@@ -46,7 +36,3 @@ artifacts {
     archives javadocJar
 }
 
-<<<<<<< local
-=======
-
->>>>>>> other
