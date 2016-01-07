@@ -27,6 +27,16 @@
 package org.lodgon.openmapfx.core;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.scene.image.Image;
 
 /** Describes a type of tile that can be returned from a {@link TileProvider}, 
  * for example, map, terrain or satellite. The base address is set here to be 
@@ -77,6 +87,7 @@ public class TileType implements MapTileType {
     public String getFileCached(int zoom, long i, long j) {
         if (fileStorageBase != null) {
             String enc = File.separator+zoom+File.separator+i+File.separator+j+".png";
+            System.out.println("looking for "+enc+" in "+fileStorageBase);
             File candidate = new File(fileStorageBase, enc);
             if (candidate.exists()) {
                 return "file://"+candidate.getAbsolutePath();
@@ -86,10 +97,48 @@ public class TileType implements MapTileType {
     }
     @Override
     public String getFullURL (int zoom, long i, long j) {
-        return getBaseURL() + zoom + "/" + i + "/" + j + ".png";
+        String cached = getFileCached(zoom, i, j);
+        return (cached != null)? cached: getBaseURL() + zoom + "/" + i + "/" + j + ".png";
     }
     
-	@Override
+    public InputStream getInputStream(int zoom, long i, long j) {
+        try {
+            String cached = getFileCached(zoom, i, j);
+            if (cached != null) {
+                try {
+                    return new FileInputStream(new File(cached));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(TileType.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            String urlString = getBaseURL() + zoom + "/" + i + "/" + j + ".png";
+            URL url = new URL(urlString);
+            InputStream inputStream = url.openConnection().getInputStream();
+            if (fileStorageBase != null) {
+                String enc = File.separator+zoom+File.separator+i+File.separator+j+".png";
+                File candidate = new File(fileStorageBase, enc);
+                candidate.getParentFile().mkdirs();
+                try (FileOutputStream fos = new FileOutputStream(candidate)) {
+                    byte[] buff = new byte[4096];
+                    int len = inputStream.read(buff);
+                    while (len > 0) {
+                        fos.write(buff, 0, len);
+                        len = inputStream.read(buff);
+                    }
+                }
+                inputStream.close();
+                return new FileInputStream(candidate);
+            } else return inputStream;
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(TileType.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TileType.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+       
+    }
+    
+    @Override
     public String getAttributionNotice() {
         return attributionNotice;
     }
@@ -98,5 +147,6 @@ public class TileType implements MapTileType {
     public String toString() {
         return getTypeName();
     }
+
     
 }

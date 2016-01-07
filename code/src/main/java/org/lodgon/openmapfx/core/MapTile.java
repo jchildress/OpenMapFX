@@ -26,6 +26,7 @@
  */
 package org.lodgon.openmapfx.core;
 
+import java.io.InputStream;
 import static java.lang.Math.floor;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -53,7 +56,7 @@ public class MapTile extends Region {
     private final long i, j;
     private final List<MapTile> covering = new LinkedList<>();
 
-    private boolean debug = false;
+    private boolean debug = true;
 
     private Label debugLabel = new Label();
     static AtomicInteger createcnt = new AtomicInteger(0);
@@ -90,12 +93,14 @@ public class MapTile extends Region {
         scale.setPivotY(0);
         getTransforms().add(scale);
         //String url = TILESERVER + zoom + "/" + i + "/" + j + ".png";
-        String url = mapArea.tileTypeProperty().get().getFullURL(zoom, i, j);// , ig, ig).getBaseURL() + zoom + "/" + i + "/" + j + ".png";
+        InputStream is = mapArea.tileTypeProperty().get().getInputStream(zoom, i, j);// , ig, ig).getBaseURL() + zoom + "/" + i + "/" + j + ".png";
         if (debug) {
-            System.out.println("Creating maptile " + this + " with url = " + url);
+            System.out.println("Creating maptile " + this + " with is = " + is);
         }
-        image = new Image(url, true);
+        image = new Image(is);
         loading.bind(image.progressProperty().lessThan(1.));
+    
+        
         ImageView iv = new ImageView(image);
         if (debug) debugLabel.setText("[" + zoom + "-" + i + "-" + j + "]");
         getChildren().addAll(iv, debugLabel);
@@ -111,8 +116,9 @@ public class MapTile extends Region {
         image.progressProperty().addListener(new WeakInvalidationListener(ipl));
         if (image.getProgress() >= 1) {
             if (debug) System.out.println("[JVDBG] ASK " + parentTile + " to NOWFORGET for " + this);
-
+if (parentTile != null) {
             parentTile.removeCovering(this);
+}
         }
         zl = recalculate();
 
