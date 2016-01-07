@@ -164,7 +164,7 @@ public class MapArea extends Group implements BaseMap {
      * Move the center of the map vertically by a number of pixels. After this
      * operation, it will be checked if new tiles need to be downloaded
      *
-     * @param dx the number of pixels
+     * @param dy the number of pixels
      */
     public void moveY(double dy) {
         double zoom = zoomProperty.get();

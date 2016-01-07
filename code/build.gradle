@@ -19,4 +19,20 @@ apply from: 'mavenPublish.gradle'
 
 group = 'org.lodgon.openmapfx'
 version = '1.0.3-SNAPSHOT'
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+artifacts {
+    archives sourceJar
+    archives javadocJar
+}
 

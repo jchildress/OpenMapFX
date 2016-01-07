@@ -45,13 +45,13 @@ public interface TileProvider {
     
     /** Get an array of {@link TileType}s that this provider can supply.
      * 
-     * @return 
+     * @return  the list of tyletypes
      */
     public List<TileType> getTileTypes();
     
     /** Gets the default tile type for this provider, typically the map tile.
      * 
-     * @return 
+     * @return the default tiletype
      */
     public TileType getDefaultType();
     
