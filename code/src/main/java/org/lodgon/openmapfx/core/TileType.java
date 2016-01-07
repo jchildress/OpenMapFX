@@ -33,6 +33,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,7 +92,7 @@ public class TileType implements MapTileType {
             System.out.println("looking for "+enc+" in "+fileStorageBase);
             File candidate = new File(fileStorageBase, enc);
             if (candidate.exists()) {
-                return "file://"+candidate.getAbsolutePath();
+                return candidate.toURI().toString();
             } 
         }
         return null;
@@ -106,8 +108,10 @@ public class TileType implements MapTileType {
             String cached = getFileCached(zoom, i, j);
             if (cached != null) {
                 try {
-                    return new FileInputStream(new File(cached));
+                    return new FileInputStream(new File(new URI(cached)));
                 } catch (FileNotFoundException ex) {
+                    Logger.getLogger(TileType.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (URISyntaxException ex) {
                     Logger.getLogger(TileType.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
