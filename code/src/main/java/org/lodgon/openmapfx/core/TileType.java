@@ -36,8 +36,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.scene.image.Image;
 
 /** Describes a type of tile that can be returned from a {@link TileProvider}, 
@@ -47,7 +52,11 @@ import javafx.scene.image.Image;
  * @author Geoff Capper
  */
 public class TileType implements MapTileType {
-    
+
+    private ExecutorService backgroundLoadingExecutor = Executors.newCachedThreadPool();
+
+    private boolean debug = false;
+
     private final String typeName;
     private final String baseURL;
     private final String attributionNotice;
@@ -89,7 +98,7 @@ public class TileType implements MapTileType {
     public String getFileCached(int zoom, long i, long j) {
         if (fileStorageBase != null) {
             String enc = File.separator+zoom+File.separator+i+File.separator+j+".png";
-            System.out.println("looking for "+enc+" in "+fileStorageBase);
+            if (debug) System.out.println("looking for "+enc+" in "+fileStorageBase);
             File candidate = new File(fileStorageBase, enc);
             if (candidate.exists()) {
                 return candidate.toURI().toString();
@@ -101,6 +110,20 @@ public class TileType implements MapTileType {
     public String getFullURL (int zoom, long i, long j) {
         String cached = getFileCached(zoom, i, j);
         return (cached != null)? cached: getBaseURL() + zoom + "/" + i + "/" + j + ".png";
+    }
+
+    public Worker<Image> retrieveImage(int zoom, long i, long j) {
+        Task<Image> task = new Task<Image>() {
+            @Override
+            protected Image call() throws Exception {
+                InputStream inputStream = getInputStream(zoom, i, j);
+                return new Image(inputStream);
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.setPriority(Thread.MIN_PRIORITY);
+        backgroundLoadingExecutor.execute(thread);
+        return task;
     }
     
     public InputStream getInputStream(int zoom, long i, long j) {

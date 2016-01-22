@@ -29,6 +29,8 @@ package org.lodgon.openmapfx.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+
+import javafx.concurrent.Worker;
 import javafx.scene.image.Image;
 
 /** Interface that describes a type of map tile.
@@ -64,6 +66,8 @@ public interface MapTileType {
     
     public void setFileStorageBase(String store);
     
+    public Worker<Image> retrieveImage(int zoom, long i, long j);
+
     public InputStream getInputStream(int zoom, long i, long j);
 
 }
