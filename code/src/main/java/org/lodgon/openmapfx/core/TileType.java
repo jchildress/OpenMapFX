@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  */
 public class TileType implements MapTileType {
 
-    private static boolean debug = true;
+    private static boolean debug = false;
 
     private final String typeName;
     private final String baseURL;
