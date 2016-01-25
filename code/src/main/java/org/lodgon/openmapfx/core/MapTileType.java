@@ -38,36 +38,33 @@ import javafx.scene.image.Image;
  * @author Geoff Capper
  */
 public interface MapTileType {
-    
-    /** The display name for this style of map, for use in the user interface.
-     * 
-     * @return 
+
+    /**
+     * The display name for this style of map, for use in the user interface.
+     *
+     * @return
      */
-    public String getTypeName();
-    
-	/** Returns the base URL for obtaining this type of tile from the tile provider. 
+    String getTypeName();
+
+    /**
+     * Returns the base URL for obtaining this type of tile from the tile provider.
      * For implementations that don't use a tile provider this can return null.
-     * 
-     * @return The base URL, ending in a forward slash so that zoom and location 
+     *
+     * @return The base URL, ending in a forward slash so that zoom and location
      * can be appended directly, or null.
      */
-    public String getBaseURL();
-    
-    /** An attribution for the tiles, to cover situations where copyright 
-     * requires displaying a notice based on the type of tile displayed.
-     * 
-     * @return 
-     */
-    public String getAttributionNotice();
-    
-    public String getFullURL(int zoom, long x, long y);
-    
-    public String getFileCached(int zoom, long i, long j);
-    
-    public void setFileStorageBase(String store);
-    
-    public Worker<Image> retrieveImage(int zoom, long i, long j);
+    String getBaseURL();
 
-    public InputStream getInputStream(int zoom, long i, long j);
+    /**
+     * An attribution for the tiles, to cover situations where copyright
+     * requires displaying a notice based on the type of tile displayed.
+     *
+     * @return
+     */
+    String getAttributionNotice();
+
+    Image getImage(int zoom, long x, long y);
+
+    void setFileStorageBase(String store);
 
 }

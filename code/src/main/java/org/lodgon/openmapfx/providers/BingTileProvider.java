@@ -44,12 +44,7 @@ public class BingTileProvider implements TileProvider {
         this.server = server;
         TileType tileType = new TileType("BingMap", "http://tile.openstreetmap.org/") {
             @Override
-            public String getFullURL(int zoom, long i, long j) {
-                String exists = getFileCached(zoom, i, j);
-                if (exists != null) { 
-                    return exists;
-                
-                }
+            protected String calculateURL(int zoom, long i, long j) {
                 return server + getQuadKey(zoom, i, j)+"?g=1";
             }
             
@@ -91,7 +86,7 @@ public class BingTileProvider implements TileProvider {
             if ((y & mask) != 0) {
                 digit += 2;
             }
-            quadKey.append("" + digit);
+            quadKey.append(digit);
         }
 
         return quadKey.toString();
