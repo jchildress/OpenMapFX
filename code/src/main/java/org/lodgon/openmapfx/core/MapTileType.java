@@ -63,7 +63,7 @@ public interface MapTileType {
      */
     String getAttributionNotice();
 
-    Image getImage(int zoom, long x, long y);
+    Worker<Image> getImage(int zoom, long x, long y);
 
     void setFileStorageBase(String store);
 

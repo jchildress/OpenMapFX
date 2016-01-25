@@ -26,6 +26,8 @@
  */
 package org.lodgon.openmapfx.core;
 
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -97,8 +99,15 @@ public class TileType implements MapTileType {
         return baseURL;
     }
 
-    public Image getImage(int zoom, long i, long j) {
-        return new Image(getImageURL(zoom, i, j), true);
+    public Worker<Image> getImage(int zoom, long i, long j) {
+        Task<Image> worker = new Task<Image>() {
+            @Override
+            protected Image call() throws Exception {
+                return new Image(getImageURL(zoom, i, j), true);
+            }
+        };
+        new Thread(worker).start();
+        return worker;
     }
 
     private String getImageURL(int zoom, long i, long j) {

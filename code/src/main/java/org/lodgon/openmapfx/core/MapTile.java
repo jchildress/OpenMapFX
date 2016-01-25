@@ -34,10 +34,13 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 
 /**
@@ -64,11 +67,22 @@ public class MapTile extends Region {
      */
     final Scale scale = new Scale();
 
+    private static final Image temporaryImage;
+    static {
+        WritableImage writableImage = new WritableImage(256, 256);
+        for (int x = 0; x < 256; x++) {
+            for (int y = 0; y < 256; y++) {
+                writableImage.getPixelWriter().setColor(x, y, Color.rgb(128, 128, 128));
+            }
+        }
+        temporaryImage = writableImage;
+    }
+
     private final InvalidationListener zl;
-    private final InvalidationListener ipl;
+    private final InvalidationListener iwpl;
     private final BooleanProperty loading = new SimpleBooleanProperty();
     private final MapTile parentTile;
-    private final Image image;
+    private final Worker<Image> imageWorker;
 
     /**
      * Create a specific MapTile for a zoomlevel, x-index and y-index
@@ -94,13 +108,18 @@ public class MapTile extends Region {
 //        if (debug) {
 //            System.out.println("Creating maptile " + this + " with is = " + is);
 //        }
-        image = mapArea.tileTypeProperty().get().getImage(zoom, i, j);
-        loading.bind(image.progressProperty().lessThan(1.));
 
-
-        ImageView iv = new ImageView(image);
+        ImageView iv = new ImageView(temporaryImage);
         if (debug) debugLabel.setText("[" + zoom + "-" + i + "-" + j + "]");
         getChildren().addAll(iv, debugLabel);
+
+        imageWorker = mapArea.tileTypeProperty().get().getImage(zoom, i, j);
+        loading.bind(imageWorker.progressProperty().lessThan(1.));
+        imageWorker.stateProperty().addListener((obs, ov, nv) -> {
+            if (nv.equals(Worker.State.SUCCEEDED)) {
+                iv.setImage(imageWorker.getValue());
+            }
+        });
 
         parentTile = mapArea.findCovering(zoom, i, j);
         if (parentTile != null) {
@@ -109,9 +128,9 @@ public class MapTile extends Region {
             parentTile.addCovering(this);
         }
 
-        ipl = createImageProgressListener();
-        image.progressProperty().addListener(new WeakInvalidationListener(ipl));
-        if (image.getProgress() >= 1) {
+        iwpl = createImageWorkerProgressListener();
+        imageWorker.progressProperty().addListener(new WeakInvalidationListener(iwpl));
+        if (imageWorker.getProgress() >= 1) {
             if (debug) System.out.println("[JVDBG] ASK " + parentTile + " to NOWFORGET for " + this);
             if (parentTile != null) {
                 parentTile.removeCovering(this);
@@ -195,9 +214,9 @@ public class MapTile extends Region {
         return o -> calculatePosition();
     }
 
-    private InvalidationListener createImageProgressListener() {
+    private InvalidationListener createImageWorkerProgressListener() {
         InvalidationListener answer = o -> {
-            double progress = image.getProgress();
+            double progress = imageWorker.getProgress();
 //            System.out.println("IPL, p = "+progress+" for "+this);
             if (progress >= 1.) {
                 if (parentTile != null) {
