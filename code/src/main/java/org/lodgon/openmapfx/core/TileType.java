@@ -110,7 +110,7 @@ public class TileType implements MapTileType {
         return worker;
     }
 
-    private String getImageURL(int zoom, long i, long j) {
+    protected String getImageURL(int zoom, long i, long j) {
         String cached = getFileCached(zoom, i, j);
         if (cached != null) {
             return cached;
