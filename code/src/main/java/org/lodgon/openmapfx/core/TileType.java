@@ -103,7 +103,9 @@ public class TileType implements MapTileType {
         Task<Image> worker = new Task<Image>() {
             @Override
             protected Image call() throws Exception {
-                return new Image(getImageURL(zoom, i, j), true);
+                String imageUrl = getImageURL(zoom, i, j);
+                boolean bg = imageUrl.startsWith("http");
+                return new Image(getImageURL(zoom, i, j), bg);
             }
         };
         new Thread(worker).start();
