@@ -42,6 +42,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -132,6 +133,13 @@ public class MapArea extends Group implements BaseMap {
             }
             return;
         }
+        double localWidth = this.getScene().getWidth();
+        double localHeight = this.getScene().getHeight();
+        if ((this.getParent() != null) && (this.getParent().getParent() != null)) {
+            Bounds bounds = this.getParent().getParent().getBoundsInParent();
+            localWidth = bounds.getWidth();
+            localHeight = bounds.getHeight();
+        }
         double activeZoom = zoomProperty.get();
         double n = Math.pow(2, activeZoom);
         double lat_rad = Math.PI * lat / 180;
@@ -139,8 +147,8 @@ public class MapArea extends Group implements BaseMap {
         double jd = n * (1 - (Math.log(Math.tan(lat_rad) + 1 / Math.cos(lat_rad)) / Math.PI)) / 2;
         double mex = (double) id * 256;
         double mey = (double) jd * 256;
-        double ttx = mex - this.getScene().getWidth() / 2;
-        double tty = mey - this.getScene().getHeight() / 2;
+        double ttx = mex - localWidth / 2;
+        double tty = mey - localHeight / 2;
         setTranslateX(-1 * ttx);
         setTranslateY(-1 * tty);
         if (debug) {
