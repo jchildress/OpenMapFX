@@ -32,6 +32,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -165,9 +166,19 @@ final int MAXZOOM=16;
         double latdiff = lat1 - lat2;
         double londiff = lon1 - lon2;
         double log2 = Math.log(2.);
-        Scene scene = this.mapArea.getView().getScene();
-        double tileX = scene.getWidth() / 256;
-        double tileY = scene.getHeight() / 256;
+        
+        double localWidth = this.getScene().getWidth();
+        double localHeight = this.getScene().getHeight();
+        if (this.getParent() != null) {
+            Bounds bounds = this.getParent().getBoundsInParent();
+            localWidth = bounds.getWidth();
+            localHeight = bounds.getHeight();
+        }
+        
+        
+       // Scene scene = this.mapArea.getView().getScene();
+        double tileX = localWidth / 256;
+        double tileY = localHeight / 256;
         double latzoom = Math.log(180 * tileY / latdiff) / log2;
         double lonzoom = Math.log(360 * tileX / londiff) / log2;
         double centerX = lat2 + latdiff / 2;
